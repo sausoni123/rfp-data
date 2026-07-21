@@ -383,6 +383,30 @@
       "lastUpdate": "2026-07-21",
       "comments": "",
       "link": ""
+    },
+    {
+      "id": "1784620778978",
+      "client": "test6",
+      "status": "Contacted",
+      "pursuit": "test6",
+      "industry": "",
+      "subSector": "",
+      "subCapabilities": "",
+      "fee": "",
+      "rfpStart": "2026-07-22",
+      "rfpSubmission": "",
+      "tentativeStart": "",
+      "usiIncluded": "",
+      "ppmd": "",
+      "seniorManager": "",
+      "manager": "",
+      "usiPOC": "",
+      "team1": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-07-21",
+      "comments": "",
+      "link": ""
     }
   ],
   "pov": []
