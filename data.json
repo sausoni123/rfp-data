@@ -455,6 +455,30 @@
       "lastUpdate": "2026-07-21",
       "comments": "",
       "link": ""
+    },
+    {
+      "id": "1784621124599",
+      "client": "test9",
+      "status": "In- Progress",
+      "pursuit": "test9",
+      "industry": "Energy, Resources and Industrials",
+      "subSector": "Banking and Capital Markets",
+      "subCapabilities": "Real Estate Transformation",
+      "fee": "",
+      "rfpStart": "2026-07-23",
+      "rfpSubmission": "2026-07-23",
+      "tentativeStart": "2026-07-23",
+      "usiIncluded": "Yes",
+      "ppmd": "",
+      "seniorManager": "",
+      "manager": "",
+      "usiPOC": "",
+      "team1": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-07-21",
+      "comments": "",
+      "link": ""
     }
   ],
   "pov": []
