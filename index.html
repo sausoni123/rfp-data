@@ -255,8 +255,14 @@ let rfpData=[], povData=[], sortCol='id', sortDir=1, editingId=null, editingPovI
 // Write — GitHub Contents API (token auth)
 // ============================================================
 async function ghRead() {
-  // raw URL works for public repos without auth — cache bust with timestamp
-  const resp = await fetch(RAW_URL + '?nocache=' + Date.now());
+  // Use API with auth + cache-bust — always returns fresh data, no CDN cache
+  const resp = await fetch(API_URL + '?t=' + Date.now(), {
+    headers: {
+      'Authorization': 'token ' + GITHUB_TOKEN,
+      'Accept': 'application/vnd.github.v3.raw',
+      'Cache-Control': 'no-cache'
+    }
+  });
   if (!resp.ok) throw new Error('Failed to read data.json: ' + resp.status);
   return resp.json();
 }
