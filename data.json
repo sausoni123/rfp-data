@@ -335,6 +335,30 @@
       "lastUpdate": "",
       "comments": "",
       "link": ""
+    },
+    {
+      "id": "1784620067417",
+      "client": "test1",
+      "status": "Identified",
+      "pursuit": "test2",
+      "industry": "Financial Services",
+      "subSector": "Energy and Chemicals",
+      "subCapabilities": "Construction Audits",
+      "fee": "$120K",
+      "rfpStart": "2026-07-23",
+      "rfpSubmission": "2026-08-08",
+      "tentativeStart": "",
+      "usiIncluded": "",
+      "ppmd": "",
+      "seniorManager": "",
+      "manager": "",
+      "usiPOC": "",
+      "team1": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-07-21",
+      "comments": "",
+      "link": ""
     }
   ],
   "pov": []
