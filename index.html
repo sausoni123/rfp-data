@@ -255,12 +255,11 @@ let rfpData=[], povData=[], sortCol='id', sortDir=1, editingId=null, editingPovI
 // Write — GitHub Contents API (token auth)
 // ============================================================
 async function ghRead() {
-  // Use API with auth + cache-bust — always returns fresh data, no CDN cache
+  // Use API with auth + timestamp cache-bust — always fresh, no CDN cache
   const resp = await fetch(API_URL + '?t=' + Date.now(), {
     headers: {
       'Authorization': 'token ' + GITHUB_TOKEN,
-      'Accept': 'application/vnd.github.v3.raw',
-      'Cache-Control': 'no-cache'
+      'Accept': 'application/vnd.github.v3.raw'
     }
   });
   if (!resp.ok) throw new Error('Failed to read data.json: ' + resp.status);
