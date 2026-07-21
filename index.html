@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>I&RE Market & Growth — RFP Tracker PMY27</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --green:#00A651;--green-dark:#007A3D;--green-light:#E6F7EE;
+    --black:#111111;--grey-90:#1A1A1A;--grey-60:#666666;--grey-30:#CCCCCC;--grey-10:#F4F4F4;--white:#FFFFFF;
+    --shadow:0 2px 12px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--grey-10);color:var(--black);font-size:14px;}
+  .header{background:var(--black);color:var(--white);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;}
+  .header-brand{display:flex;align-items:center;gap:12px;}
+  .header-dot{width:10px;height:10px;background:var(--green);border-radius:50%;}
+  .header-title{font-size:15px;font-weight:600;letter-spacing:.02em;}
+  .header-sub{font-size:12px;color:var(--grey-30);}
+  .header-right{display:flex;gap:10px;align-items:center;}
+  .sync-status{font-size:11px;padding:4px 10px;border-radius:12px;font-weight:600;white-space:nowrap;}
+  .sync-ok{background:#1B5E20;color:#A5D6A7;}
+  .sync-loading{background:#1A237E;color:#90CAF9;}
+  .sync-error{background:#7B1FA2;color:#E1BEE7;}
+  .sync-offline{background:#B71C1C;color:#FFCDD2;}
+  .btn{padding:8px 16px;border-radius:4px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;}
+  .btn-primary{background:var(--green);color:var(--white);}
+  .btn-primary:hover{background:var(--green-dark);}
+  .btn-outline{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.3);}
+  .btn-outline:hover{background:rgba(255,255,255,.1);}
+  .btn-sm{padding:5px 10px;font-size:12px;}
+  .btn-danger{background:#D32F2F;color:white;}
+  .btn-danger:hover{background:#B71C1C;}
+  .btn-secondary{background:var(--grey-10);color:var(--black);border:1px solid var(--grey-30);}
+  .btn-secondary:hover{background:var(--grey-30);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .tabs{background:var(--white);border-bottom:1px solid var(--grey-30);padding:0 32px;display:flex;}
+  .tab{padding:14px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--grey-60);border-bottom:3px solid transparent;transition:all .15s;}
+  .tab.active{color:var(--green-dark);border-bottom-color:var(--green);font-weight:700;}
+  .tab:hover{color:var(--black);}
+  .container{max-width:1440px;margin:0 auto;padding:24px 32px;}
+  .section{display:none;}.section.active{display:block;}
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:8px;padding:20px 24px;box-shadow:var(--shadow);border-top:3px solid var(--grey-30);}
+  .kpi.c-green{border-top-color:var(--green);}.kpi.c-blue{border-top-color:#1565C0;}.kpi.c-won{border-top-color:#00A651;}.kpi.c-lost{border-top-color:#D32F2F;}.kpi.c-hold{border-top-color:#E65100;}
+  .kpi-num{font-size:32px;font-weight:700;line-height:1;}
+  .kpi-label{font-size:11px;font-weight:600;color:var(--grey-60);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+  .kpi-sub{font-size:12px;color:var(--grey-60);margin-top:2px;}
+  .charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;}
+  .chart-card{background:var(--white);border-radius:8px;padding:20px;box-shadow:var(--shadow);}
+  .chart-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-60);margin-bottom:16px;}
+  .filter-bar{background:var(--white);border-radius:8px;padding:14px 20px;box-shadow:var(--shadow);margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .filter-bar input,.filter-bar select{padding:7px 11px;border:1px solid var(--grey-30);border-radius:4px;font-size:13px;background:var(--grey-10);}
+  .filter-bar input:focus,.filter-bar select:focus{outline:2px solid var(--green);}
+  .filter-bar input{min-width:200px;}
+  .table-wrap{background:var(--white);border-radius:8px;box-shadow:var(--shadow);overflow:hidden;}
+  .table-header{padding:14px 20px;border-bottom:1px solid var(--grey-10);display:flex;align-items:center;justify-content:space-between;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:var(--grey-90);color:var(--white);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;}
+  thead th:hover{background:#333;}thead th.sorted{color:var(--green);}
+  tbody tr{border-bottom:1px solid var(--grey-10);transition:background .1s;}
+  tbody tr:hover{background:var(--green-light);cursor:pointer;}
+  tbody td{padding:9px 12px;font-size:13px;vertical-align:middle;}
+  .td-client{font-weight:600;}.td-pursuit{color:var(--grey-60);font-size:12px;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .no-rows{text-align:center;padding:48px;color:var(--grey-60);}
+  .badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+  .b-Won{background:#E8F5E9;color:#1B5E20;}.b-Lost{background:#FFEBEE;color:#B71C1C;}.b-Orals{background:#F3E5F5;color:#4A148C;}
+  .b-InProgress{background:#E3F2FD;color:#0D47A1;}.b-OnHold{background:#FFF3E0;color:#BF360C;}
+  .b-Submitted{background:#E0F2F1;color:#004D40;}.b-Contacted{background:#EFEBE9;color:#3E2723;}
+  .b-Identified{background:#ECEFF1;color:#263238;}.b-Verbal{background:#F1F8E9;color:#33691E;}.b-Reopened{background:#E8EAF6;color:#1A237E;}
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;align-items:center;justify-content:center;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:10px;width:800px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+  .modal-header{padding:18px 24px;border-bottom:1px solid var(--grey-10);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1;}
+  .modal-title{font-size:15px;font-weight:700;}
+  .modal-close{background:none;border:none;cursor:pointer;font-size:20px;color:var(--grey-60);line-height:1;padding:4px;}
+  .modal-body{padding:24px;}.modal-footer{padding:14px 24px;border-top:1px solid var(--grey-10);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--white);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-group{display:flex;flex-direction:column;gap:4px;}.form-group.full{grid-column:1/-1;}
+  .form-group label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--grey-60);}
+  .form-group input,.form-group select,.form-group textarea{padding:9px 12px;border:1px solid var(--grey-30);border-radius:4px;font-size:13px;font-family:inherit;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:2px solid var(--green);}
+  .form-group textarea{resize:vertical;min-height:60px;}
+  .form-section{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green-dark);border-bottom:2px solid var(--green-light);padding-bottom:5px;margin:16px 0 4px;grid-column:1/-1;}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .detail-group{}.detail-group.full{grid-column:1/-1;}
+  .detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--grey-60);margin-bottom:2px;}
+  .detail-value{font-size:14px;}
+  .detail-section{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green-dark);border-bottom:2px solid var(--green-light);padding-bottom:4px;margin:16px 0 8px;grid-column:1/-1;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--grey-90);color:var(--white);padding:12px 20px;border-radius:6px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:200;transform:translateY(80px);opacity:0;transition:all .3s;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-left:4px solid var(--green);}.toast.error{border-left:4px solid #D32F2F;}.toast.info{border-left:4px solid #1565C0;}
+  .pov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:16px;}
+  .pov-card{background:var(--white);border-radius:8px;padding:20px;box-shadow:var(--shadow);border-left:4px solid var(--green);}
+  .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:14px;margin:4px 0;}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .dl-red{color:#D32F2F;font-weight:700;}.dl-amber{color:#E65100;font-weight:700;}.dl-ok{color:var(--grey-60);}
+  .tag{display:inline-block;background:var(--grey-10);border:1px solid var(--grey-30);border-radius:3px;padding:2px 7px;font-size:11px;color:var(--grey-60);}
+
+  /* AUTH BANNER */
+  .auth-banner{background:#1A237E;color:white;padding:12px 32px;font-size:13px;display:flex;align-items:center;gap:12px;}
+  .auth-banner a{color:#90CAF9;font-weight:700;}
+  .auth-banner.hidden{display:none;}
+
+  @media(max-width:900px){.kpi-row{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- AUTH BANNER - shown if not logged in -->
+<div class="auth-banner hidden" id="auth-banner">
+  ⚠ Could not load data. Check your internet connection and <a href="#" onclick="manualRefresh();return false;">click Refresh</a>.
+  <button onclick="document.getElementById('auth-banner').className='auth-banner hidden'" style="margin-left:auto;background:none;border:none;color:white;cursor:pointer;font-size:16px">✕</button>
+</div>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-dot"></div>
+    <div>
+      <div class="header-title">I&amp;RE Market &amp; Growth — RFP Tracker</div>
+      <div class="header-sub">PMY27 · Infrastructure &amp; Real Estate · Live · Google Sheets</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="sync-status sync-loading" id="sync-badge">⟳ Connecting…</span>
+    <button class="btn btn-outline btn-sm" onclick="manualRefresh()">⟳ Refresh</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add RFP</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showSection('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showSection('rfp-list',this)">RFP Tracker</div>
+  <div class="tab" onclick="showSection('pov-list',this)">POV Development</div>
+</div>
+
+<div class="container">
+
+<div class="section active" id="dashboard">
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi c-green"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Total RFPs</div></div>
+    <div class="kpi c-blue"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Active</div></div>
+    <div class="kpi c-won"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Won</div></div>
+    <div class="kpi c-lost"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Lost</div></div>
+    <div class="kpi c-hold"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">On Hold</div></div>
+  </div>
+  <div class="charts-row">
+    <div class="chart-card"><div class="chart-title">Status Breakdown</div><canvas id="chart-status" height="200"></canvas></div>
+    <div class="chart-card"><div class="chart-title">By Industry</div><canvas id="chart-industry" height="200"></canvas></div>
+    <div class="chart-card"><div class="chart-title">By Capability</div><canvas id="chart-cap" height="200"></canvas></div>
+  </div>
+  <div class="table-wrap">
+    <div class="table-header"><strong style="font-size:13px">⏰ Upcoming Deadlines</strong><span id="deadline-count" style="font-size:13px;color:var(--grey-60)"></span></div>
+    <table><thead><tr><th>Client</th><th>Pursuit</th><th>Status</th><th>Submission Date</th><th>Days Left</th><th>USI POC</th></tr></thead>
+    <tbody id="deadline-tbody"><tr><td colspan="6" class="no-rows">Loading…</td></tr></tbody></table>
+  </div>
+</div>
+
+<div class="section" id="rfp-list">
+  <div class="filter-bar">
+    <input type="text" id="search" placeholder="Search client, pursuit, team…" oninput="renderTable()"/>
+    <select id="filter-status" onchange="renderTable()">
+      <option value="">All Statuses</option>
+      <option>Won</option><option>Lost</option><option>Orals</option>
+      <option>In- Progress</option><option>On-Hold</option>
+      <option>Proposal Submitted</option><option>Contacted</option>
+      <option>Identified</option><option>Verbal Commitment</option><option>Re-Opened</option>
+    </select>
+    <select id="filter-industry" onchange="renderTable()"><option value="">All Industries</option></select>
+    <select id="filter-cap" onchange="renderTable()"><option value="">All Capabilities</option></select>
+    <button class="btn btn-secondary btn-sm" onclick="clearFilters()">Clear</button>
+    <span style="margin-left:auto;font-size:12px;color:var(--grey-60)">Click row to view · auto-refreshes every 30s</span>
+  </div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <span id="table-count" style="font-size:13px;color:var(--grey-60)"></span>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add RFP</button>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th onclick="sortBy('id')" id="th-id"># ↕</th>
+        <th onclick="sortBy('client')" id="th-client">Client ↕</th>
+        <th onclick="sortBy('industry')" id="th-industry">Industry ↕</th>
+        <th onclick="sortBy('pursuit')" id="th-pursuit">Pursuit Title ↕</th>
+        <th onclick="sortBy('subCapabilities')" id="th-subCapabilities">Capability ↕</th>
+        <th onclick="sortBy('status')" id="th-status">Status ↕</th>
+        <th onclick="sortBy('rfpSubmission')" id="th-rfpSubmission">Submission ↕</th>
+        <th onclick="sortBy('fee')" id="th-fee">Fee ↕</th>
+        <th>USI POC</th>
+        <th onclick="sortBy('lastUpdate')" id="th-lastUpdate">Updated ↕</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody id="rfp-tbody"><tr><td colspan="11" class="no-rows">Loading…</td></tr></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="pov-list">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h2 style="font-size:16px;font-weight:700">POV Development Tracker</h2>
+    <button class="btn btn-primary btn-sm" onclick="openAddPovModal()">+ Add POV</button>
+  </div>
+  <div id="pov-container"><div style="text-align:center;padding:48px;color:var(--grey-60)">Loading…</div></div>
+</div>
+
+</div>
+
+<div class="overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title"></span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG — GitHub JSON Backend
+// ============================================================
+const GITHUB_USER  = "sausoni123";
+const GITHUB_REPO  = "rfp-data";
+const GITHUB_FILE  = "data.json";
+const GITHUB_TOKEN = "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";
+const RAW_URL      = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FILE}`;
+const API_URL      = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+const REFRESH_MS   = 30000;
+let   fileSHA      = null; // GitHub requires SHA to update a file
+
+const INDUSTRIES  = ["Consumer","Energy, Resources and Industrials","Financial Services","Technology, Media and Telecommunications","Government and Public Services","Life Sciences and Health Care"];
+const SUB_SECTORS = ["Automotive","Consumer Products","Retail, Wholesale and Distribution","Transport, Hospitality and Services","Industrial Products and Construction","Power Utilities and Renewables","Energy and Chemicals","Mining and Metals","Banking and Capital Markets","Insurance","Investment Management","Real Estate","Technology","Telecommunications","Media and Entertainment","Defense, Security and Justice","Federal Health","Civil","State and Local","Higher Education","Health Care","Lifesciences"];
+const CAPABILITIES= ["Real Estate Technology","Operational Finance Transformation","Operational Finance Technology","Real Estate Transformation","Construction Audits","Environmental Audits","Tech Implementation","Project Delivery","Real Estate Location Strategy"];
+const STATUSES    = ["Identified","Contacted","In- Progress","Proposal Submitted","Orals","Verbal Commitment","Won","Lost","On-Hold","Re-Opened"];
+
+// ============================================================
+// STATE
+// ============================================================
+let rfpData=[], povData=[], sortCol='id', sortDir=1, editingId=null, editingPovId=null, refreshTimer=null;
+
+// ============================================================
+// GITHUB JSON API
+// Read  — raw.githubusercontent.com (public, no auth)
+// Write — GitHub Contents API (token auth)
+// ============================================================
+async function ghRead() {
+  // Use API URL (not raw CDN) to always get fresh uncached data
+  const resp = await fetch(API_URL + '?t=' + Date.now(), {
+    headers: {
+      'Authorization': 'token ' + GITHUB_TOKEN,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  });
+  if (!resp.ok) throw new Error('Failed to read data.json: ' + resp.status);
+  const meta = await resp.json();
+  // Content is base64 encoded
+  const content = decodeURIComponent(escape(atob(meta.content.replace(/\n/g, ''))));
+  return JSON.parse(content);
+}
+
+async function ghWrite(data) {
+  // Always fetch fresh SHA before writing to avoid stale SHA conflicts
+  const metaResp = await fetch(API_URL + '?t=' + Date.now(), {
+    headers: {
+      'Authorization': 'token ' + GITHUB_TOKEN,
+      'Accept': 'application/vnd.github.v3+json'
+    }
+  });
+  if (!metaResp.ok) throw new Error('Could not fetch file SHA: ' + metaResp.status);
+  const metaJson = await metaResp.json();
+  fileSHA = metaJson.sha;
+
+  const body = {
+    message: 'RFP Tracker update ' + new Date().toISOString(),
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+    sha: fileSHA
+  };
+
+  const resp = await fetch(API_URL, {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'token ' + GITHUB_TOKEN,
+      'Accept': 'application/vnd.github.v3+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error('GitHub write failed: ' + (err.message || resp.status));
+  }
+  const result = await resp.json();
+  // Cache the new SHA so next write is instant
+  fileSHA = result.content.sha;
+  return result;
+}
+
+// ============================================================
+// SYNC — read from GitHub JSON
+// ============================================================
+async function syncAll(silent=false) {
+  setSyncStatus('loading');
+  try {
+    const data = await ghRead();
+    rfpData = (data.rfp || []);
+    povData = (data.pov || []);
+    renderAll();
+    setSyncStatus('ok');
+    document.getElementById('auth-banner').className = 'auth-banner hidden';
+    if (!silent) showToast('Data refreshed ✓', 'success');
+  } catch(err) {
+    setSyncStatus('error');
+    console.error(err);
+    if (!silent) showToast('⚠ ' + err.message, 'error');
+  }
+}
+
+async function ghSave() {
+  await ghWrite({ rfp: rfpData, pov: povData });
+}
+
+function setSyncStatus(state) {
+  const el = document.getElementById('sync-badge');
+  const t  = new Date().toLocaleTimeString();
+  if (state==='ok')      { el.className='sync-status sync-ok';      el.textContent='✓ Live · '+t; }
+  else if (state==='loading') { el.className='sync-status sync-loading'; el.textContent='⟳ Syncing…'; }
+  else                   { el.className='sync-status sync-offline';  el.textContent='⚠ Auth needed'; }
+}
+
+function manualRefresh() {
+  clearInterval(refreshTimer);
+  syncAll(false);
+  refreshTimer = setInterval(() => syncAll(true), REFRESH_MS);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function bkey(s){ return (s||'').replace(/[\s\-]+/g,'').replace('InInProgress','InProgress').replace('Progress','InProgress'); }
+function badge(s){ return `<span class="badge b-${bkey(s)}">${s||'Unknown'}</span>`; }
+function daysLeft(d){ if(!d||d==='TBD')return null; const dt=new Date(d); if(isNaN(dt))return null; return Math.ceil((dt-new Date())/86400000); }
+function deadlineEl(d){ const n=daysLeft(d); if(n===null)return '<span class="dl-ok">—</span>'; if(n<0)return `<span class="dl-red">⚠ ${Math.abs(n)}d overdue</span>`; if(n<=7)return `<span class="dl-red">🔴 ${n}d</span>`; if(n<=21)return `<span class="dl-amber">🟡 ${n}d</span>`; return `<span class="dl-ok">${n}d</span>`; }
+function today(){ return new Date().toISOString().split('T')[0]; }
+
+
+function formatFee(val) {
+  if (!val || val === '') return '';
+  const n = parseFloat(val);
+  if (isNaN(n)) return val;
+  if (n >= 1000000) return '$' + (n/1000000).toFixed(n%1000000===0?0:1) + 'M';
+  if (n >= 1000) return '$' + (n/1000).toFixed(n%1000===0?0:0) + 'K';
+  return '$' + n.toLocaleString();
+}
+function cleanDate(val) {
+  if (!val || val === 'undefined') return '';
+  // Already clean yyyy-MM-dd
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  // Parse full date string like "Sat Jan 31 2026 00:00:00 GMT+0530 (India Standard Time)"
+  const d = new Date(val);
+  if (!isNaN(d)) return d.toISOString().split('T')[0];
+  return val;
+}
+function fmtDate(val) {
+  const c = cleanDate(val);
+  if (!c) return '—';
+  return c;
+}
+
+// ============================================================
+// KPI
+// ============================================================
+function renderKPIs(){
+  const a=rfpData.filter(r=>r.client);
+  const won=a.filter(r=>r.status==='Won').length, lost=a.filter(r=>r.status==='Lost').length;
+  const active=a.filter(r=>['In- Progress','Orals','Proposal Submitted','Contacted','Identified'].includes(r.status)).length;
+  const hold=a.filter(r=>r.status==='On-Hold').length;
+  const wr=won+lost>0?Math.round(won/(won+lost)*100):0;
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi c-green"><div class="kpi-num">${a.length}</div><div class="kpi-label">Total RFPs</div></div>
+    <div class="kpi c-blue"><div class="kpi-num">${active}</div><div class="kpi-label">Active Pipeline</div><div class="kpi-sub">In Progress / Orals</div></div>
+    <div class="kpi c-won"><div class="kpi-num">${won}</div><div class="kpi-label">Won</div><div class="kpi-sub">Win rate: ${wr}%</div></div>
+    <div class="kpi c-lost"><div class="kpi-num">${lost}</div><div class="kpi-label">Lost</div></div>
+    <div class="kpi c-hold"><div class="kpi-num">${hold}</div><div class="kpi-label">On Hold</div></div>`;
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+const charts={};
+function renderCharts(){
+  const a=rfpData.filter(r=>r.client);
+  const sC={},iC={},cC={};
+  a.forEach(r=>{
+    sC[r.status||'Unknown']=(sC[r.status||'Unknown']||0)+1;
+    const ik=(r.industry||'Other').split(',')[0].trim().split(' ').slice(0,2).join(' ');
+    iC[ik]=(iC[ik]||0)+1;
+    cC[r.subCapabilities||'Other']=(cC[r.subCapabilities||'Other']||0)+1;
+  });
+  const SC={'Won':'#00A651','Lost':'#D32F2F','Orals':'#6A1B9A','In- Progress':'#1565C0','On-Hold':'#E65100','Proposal Submitted':'#00796B','Contacted':'#5D4037','Identified':'#37474F'};
+  mk('chart-status','doughnut',Object.keys(sC),Object.values(sC),Object.keys(sC).map(k=>SC[k]||'#999'));
+  mk('chart-industry','bar',Object.keys(iC),Object.values(iC),['#00A651','#1565C0','#6A1B9A','#E65100','#D32F2F','#5D4037']);
+  mk('chart-cap','bar',Object.keys(cC),Object.values(cC),['#00A651','#007A3D','#339966','#66BB99','#99DDBB','#CCEECC']);
+}
+function mk(id,type,labels,data,colors){
+  const ctx=document.getElementById(id); if(!ctx)return;
+  if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(ctx,{type,data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,borderRadius:type==='bar'?4:0}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:type==='doughnut',position:'right',labels:{boxWidth:10,font:{size:10}}}},
+      scales:type==='bar'?{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:10},stepSize:1},grid:{color:'#f0f0f0'}}}:{}}});
+}
+
+// ============================================================
+// DEADLINES
+// ============================================================
+function renderDeadlines(){
+  const up=rfpData.filter(r=>r.client&&r.rfpSubmission&&r.rfpSubmission!=='TBD'&&!['Won','Lost','On-Hold'].includes(r.status))
+    .map(r=>({...r,dl:daysLeft(r.rfpSubmission)})).filter(r=>r.dl!==null&&r.dl>=0)
+    .sort((a,b)=>a.dl-b.dl).slice(0,8);
+  document.getElementById('deadline-count').textContent=`${up.length} upcoming`;
+  const tb=document.getElementById('deadline-tbody');
+  if(!up.length){tb.innerHTML=`<tr><td colspan="6" class="no-rows">No upcoming deadlines</td></tr>`;return;}
+  tb.innerHTML=up.map(r=>`<tr onclick="viewRFP('${r.id}')" style="cursor:pointer">
+    <td class="td-client">${r.client}</td><td class="td-pursuit">${r.pursuit}</td>
+    <td>${badge(r.status)}</td><td>${r.rfpSubmission}</td>
+    <td>${deadlineEl(r.rfpSubmission)}</td><td>${r.usiPOC||'—'}</td></tr>`).join('');
+}
+
+// ============================================================
+// TABLE
+// ============================================================
+function filterData(){
+  const q=(document.getElementById('search')?.value||'').toLowerCase();
+  const st=document.getElementById('filter-status')?.value||'';
+  const ind=document.getElementById('filter-industry')?.value||'';
+  const cap=document.getElementById('filter-cap')?.value||'';
+  return rfpData.filter(r=>{
+    if(!r.client)return false;
+    const txt=[r.client,r.industry,r.pursuit,r.subCapabilities,r.usiPOC,r.ppmd,r.manager,r.team1,r.team2,r.team3].join(' ').toLowerCase();
+    if(q&&!txt.includes(q))return false;
+    if(st&&r.status!==st)return false;
+    if(ind&&r.industry!==ind)return false;
+    if(cap&&r.subCapabilities!==cap)return false;
+    return true;
+  });
+}
+function clearFilters(){['search','filter-status','filter-industry','filter-cap'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderTable();}
+function sortBy(col){
+  if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
+  document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted'));
+  const th=document.getElementById('th-'+col);if(th)th.classList.add('sorted');
+  renderTable();
+}
+function renderTable(){
+  const data=filterData().sort((a,b)=>{let av=a[sortCol]||'',bv=b[sortCol]||'';if(sortCol==='id'){av=parseInt(av)||0;bv=parseInt(bv)||0;}return av>bv?sortDir:av<bv?-sortDir:0;});
+  document.getElementById('table-count').textContent=`${data.length} RFP${data.length!==1?'s':''}`;
+  const tb=document.getElementById('rfp-tbody');
+  if(!data.length){tb.innerHTML=`<tr><td colspan="11" class="no-rows">No RFPs match filters</td></tr>`;return;}
+  tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')">
+    <td style="color:var(--grey-60)">${r.id}</td>
+    <td class="td-client">${r.client}</td>
+    <td><span class="tag">${(r.industry||'').split(',')[0].split(' ')[0]}</span></td>
+    <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
+    <td><span class="tag">${r.subCapabilities||'—'}</span></td>
+    <td>${badge(r.status)}</td>
+    <td style="white-space:nowrap;font-size:12px">${r.rfpSubmission||'—'}</td>
+    <td style="font-weight:600;color:var(--green-dark)">${r.fee||'—'}</td>
+    <td style="font-size:12px">${r.usiPOC||'—'}</td>
+    <td style="color:var(--grey-60);font-size:12px">${r.lastUpdate||'—'}</td>
+    <td onclick="event.stopPropagation()" style="white-space:nowrap">
+      <button class="btn btn-sm btn-secondary" onclick="editRFP('${r.id}')">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteRFP('${r.id}')">Del</button>
+    </td></tr>`).join('');
+}
+
+// ============================================================
+// VIEW / EDIT / ADD
+// ============================================================
+function viewRFP(id){
+  const r=rfpData.find(x=>x.id===id);if(!r)return;
+  document.getElementById('modal-title').textContent=`${r.client} — ${r.pursuit}`;
+  document.getElementById('modal-body').innerHTML=`<div class="detail-grid">
+    <div class="detail-section">RFP Details</div>
+    <div class="detail-group"><div class="detail-label">Client</div><div class="detail-value">${r.client}</div></div>
+    <div class="detail-group"><div class="detail-label">Status</div><div class="detail-value">${badge(r.status)}</div></div>
+    <div class="detail-group full"><div class="detail-label">Pursuit Title</div><div class="detail-value">${r.pursuit}</div></div>
+    <div class="detail-group"><div class="detail-label">Industry</div><div class="detail-value">${r.industry||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Sub-Sector</div><div class="detail-value">${r.subSector||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Sub-Capabilities</div><div class="detail-value">${r.subCapabilities||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Proposed Fee</div><div class="detail-value" style="font-weight:700;color:var(--green-dark)">${r.fee||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">RFP Start</div><div class="detail-value">${r.rfpStart||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Submission Date</div><div class="detail-value">${r.rfpSubmission||'—'} ${deadlineEl(r.rfpSubmission)}</div></div>
+    <div class="detail-group"><div class="detail-label">Tentative Project Start</div><div class="detail-value">${r.tentativeStart||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">USI Resources in Pricing?</div><div class="detail-value">${r.usiIncluded||'—'}</div></div>
+    <div class="detail-section">Team</div>
+    <div class="detail-group"><div class="detail-label">US PPMD</div><div class="detail-value">${r.ppmd||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Senior Manager</div><div class="detail-value">${r.seniorManager||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Manager</div><div class="detail-value">${r.manager||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">USI POC</div><div class="detail-value">${r.usiPOC||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">USI Team</div><div class="detail-value">${[r.team1,r.team2,r.team3].filter(t=>t&&t!=='--').join(' · ')||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Last Updated</div><div class="detail-value">${r.lastUpdate||'—'}</div></div>
+    ${r.comments?`<div class="detail-group full"><div class="detail-label">Comments</div><div class="detail-value">${r.comments}</div></div>`:''}
+    ${r.link?`<div class="detail-group full"><div class="detail-label">File Link</div><div class="detail-value"><a href="${r.link}" target="_blank" style="color:var(--green)">${r.link}</a></div></div>`:''}
+  </div>`;
+  document.getElementById('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="editRFP('${r.id}')">Edit</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function openAddModal(){editingId=null;openRFPForm({});}
+function editRFP(id){editingId=id;closeModal();setTimeout(()=>openRFPForm(rfpData.find(x=>x.id===id)||{}),100);}
+function openRFPForm(r){
+  const sO=STATUSES.map(s=>`<option${r.status===s?' selected':''}>${s}</option>`).join('');
+  const iO=INDUSTRIES.map(i=>`<option${r.industry===i?' selected':''}>${i}</option>`).join('');
+  const cO=CAPABILITIES.map(c=>`<option${r.subCapabilities===c?' selected':''}>${c}</option>`).join('');
+  const uO=['Yes','No'].map(v=>`<option${r.usiIncluded===v?' selected':''}>${v}</option>`).join('');
+  document.getElementById('modal-title').textContent=editingId?`Edit — ${r.client}`:'Add New RFP';
+  document.getElementById('modal-body').innerHTML=`<div class="form-grid">
+    <div class="form-section">RFP Information</div>
+    <div class="form-group"><label>Client Name *</label><input id="f-client" value="${r.client||''}"/></div>
+    <div class="form-group"><label>Proposal Status *</label><select id="f-status"><option value="">Select…</option>${sO}</select></div>
+    <div class="form-group full"><label>Pursuit Title / Phase *</label><input id="f-pursuit" value="${r.pursuit||''}"/></div>
+    <div class="form-group"><label>Industry</label><select id="f-industry"><option value="">Select…</option>${iO}</select></div>
+    <div class="form-group"><label>Sub-Sector</label><input id="f-subsector" value="${r.subSector||''}" list="dl-sub"/><datalist id="dl-sub">${SUB_SECTORS.map(s=>`<option>${s}</option>`).join('')}</datalist></div>
+    <div class="form-group"><label>Sub-Capabilities</label><select id="f-cap"><option value="">Select…</option>${cO}</select></div>
+    <div class="form-group"><label>Proposed Fee ($)</label><div style="display:flex;align-items:center;border:1px solid var(--grey-30);border-radius:4px;overflow:hidden;background:white"><span style="padding:9px 10px;background:var(--grey-10);color:var(--grey-60);font-weight:700;border-right:1px solid var(--grey-30)">$</span><input id="f-fee" type="number" min="0" step="1000" value="${(r.fee||'').replace(/[^0-9.]/g,'')}" placeholder="0" style="border:none;border-radius:0;flex:1"/></div></div>
+    <div class="form-group"><label>RFP Start Date</label><input id="f-start" type="date" value="${r.rfpStart||''}"/></div>
+    <div class="form-group"><label>RFP Submission Date</label><input id="f-submission" type="date" value="${r.rfpSubmission&&r.rfpSubmission!=='TBD'?r.rfpSubmission:''}"/></div>
+    <div class="form-group"><label>Tentative Project Start</label><input id="f-projstart" type="date" value="${r.tentativeStart&&r.tentativeStart!=='TBD'?r.tentativeStart:''}"/></div>
+    <div class="form-group"><label>USI Resources in Pricing?</label><select id="f-usi"><option value="">Select…</option>${uO}</select></div>
+    <div class="form-section">Team</div>
+    <div class="form-group"><label>US PPMD(s)</label><input id="f-ppmd" value="${r.ppmd||''}"/></div>
+    <div class="form-group"><label>Senior Manager(s)</label><input id="f-sm" value="${r.seniorManager||''}"/></div>
+    <div class="form-group"><label>Manager(s)</label><input id="f-mgr" value="${r.manager||''}"/></div>
+    <div class="form-group"><label>USI POC</label><input id="f-poc" value="${r.usiPOC||''}"/></div>
+    <div class="form-group"><label>USI Team Member 1</label><input id="f-t1" value="${r.team1||''}"/></div>
+    <div class="form-group"><label>USI Team Member 2</label><input id="f-t2" value="${r.team2||''}"/></div>
+    <div class="form-group"><label>USI Team Member 3</label><input id="f-t3" value="${r.team3||''}"/></div>
+    <div class="form-group"><label>Last Update Date</label><input id="f-lastupdate" type="date" value="${r.lastUpdate||today()}"/></div>
+    <div class="form-group full"><label>Comments</label><textarea id="f-comments">${r.comments||''}</textarea></div>
+    <div class="form-group full"><label>File Link (SharePoint / URL)</label><input id="f-link" value="${r.link||''}"/></div>
+  </div>`;
+  document.getElementById('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="save-btn" onclick="saveRFP()">💾 Save</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+async function saveRFP(){
+  const client=document.getElementById('f-client').value.trim();
+  const status=document.getElementById('f-status').value;
+  const pursuit=document.getElementById('f-pursuit').value.trim();
+  if(!client||!status||!pursuit){showToast('Client, Status, and Pursuit are required','error');return;}
+  const row={
+    id:editingId||String(Date.now()),client,status,pursuit,
+    industry:document.getElementById('f-industry').value,
+    subSector:document.getElementById('f-subsector').value,
+    subCapabilities:document.getElementById('f-cap').value,
+    fee:formatFee(document.getElementById('f-fee').value),
+    rfpStart:document.getElementById('f-start').value,
+    rfpSubmission:document.getElementById('f-submission').value,
+    tentativeStart:document.getElementById('f-projstart').value,
+    usiIncluded:document.getElementById('f-usi').value,
+    ppmd:document.getElementById('f-ppmd').value,
+    seniorManager:document.getElementById('f-sm').value,
+    manager:document.getElementById('f-mgr').value,
+    usiPOC:document.getElementById('f-poc').value,
+    team1:document.getElementById('f-t1').value,
+    team2:document.getElementById('f-t2').value,
+    team3:document.getElementById('f-t3').value,
+    lastUpdate:document.getElementById('f-lastupdate').value||today(),
+    comments:document.getElementById('f-comments').value,
+    link:document.getElementById('f-link').value,
+  };
+  const btn=document.getElementById('save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  // Update local state first
+  if(editingId){const i=rfpData.findIndex(x=>x.id===editingId);if(i>-1)rfpData[i]=row;}
+  else rfpData.push(row);
+  // Re-render immediately so user sees the new row
+  renderAll();
+  closeModal();
+  try{
+    await ghSave();
+    showToast(editingId?'Updated ✓':'Added ✓','success');
+  }catch(err){
+    // Rollback on failure
+    if(editingId){const i=rfpData.findIndex(x=>x.id===row.id);if(i>-1)rfpData[i]=row;}
+    else rfpData=rfpData.filter(x=>x.id!==row.id);
+    renderAll();
+    showToast('Save failed: '+err.message,'error');
+  }
+}
+async function deleteRFP(id){
+  if(!confirm('Delete this RFP from Google Sheets?'))return;
+  const backup=[...rfpData];
+  rfpData=rfpData.filter(r=>r.id!==id);renderAll();
+  try{
+    await ghSave();
+    showToast('Deleted ✓','success');
+  }catch(err){rfpData=backup;renderAll();showToast('Delete failed: '+err.message,'error');}
+}
+
+// ============================================================
+// POV
+// ============================================================
+function renderPOV(){
+  const c=document.getElementById('pov-container');
+  if(!povData.length){
+    c.innerHTML=`<div class="table-wrap"><div style="text-align:center;padding:64px;color:var(--grey-60)"><div style="font-size:48px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:16px">No POV documents yet</div><button class="btn btn-primary" onclick="openAddPovModal()">+ Add First POV</button></div></div>`;
+    return;
+  }
+  c.innerHTML=`<div class="table-wrap"><div style="overflow-x:auto"><table>
+    <thead><tr>
+      <th>#</th><th>Client</th><th>Industry</th><th>Topic</th><th>Sub-Capability</th>
+      <th>Status</th><th>Start Date</th><th>USI POC</th><th>PPMD</th><th>Comments</th><th>Actions</th>
+    </tr></thead>
+    <tbody>${povData.map((p,i)=>`<tr>
+      <td style="color:var(--grey-60)">${i+1}</td>
+      <td class="td-client">${p.client||'—'}</td>
+      <td><span class="tag">${(p.industry||'').split(',')[0].split(' ')[0]||'—'}</span></td>
+      <td class="td-pursuit" title="${p.topic||''}">${p.topic||'—'}</td>
+      <td><span class="tag">${p.subCapabilities||'—'}</span></td>
+      <td>${badge(p.status)}</td>
+      <td style="font-size:12px;white-space:nowrap">${fmtDate(p.startDate)}</td>
+      <td style="font-size:12px">${p.usiPOC||'—'}</td>
+      <td style="font-size:12px">${p.ppmd||'—'}</td>
+      <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.comments||''}">${p.comments||'—'}</td>
+      <td onclick="event.stopPropagation()" style="white-space:nowrap">
+        <button class="btn btn-sm btn-secondary" onclick="editPov('${p.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deletePov('${p.id}')">Del</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table></div></div>`;
+}
+function openAddPovModal(){editingPovId=null;openPovForm({});}
+function editPov(id){editingPovId=id;openPovForm(povData.find(x=>x.id===id)||{});}
+function openPovForm(p){
+  const sO=['Not Started','In Progress','Completed'].map(s=>`<option${p.status===s?' selected':''}>${s}</option>`).join('');
+  const iO=INDUSTRIES.map(i=>`<option${p.industry===i?' selected':''}>${i}</option>`).join('');
+  document.getElementById('modal-title').textContent=editingPovId?'Edit POV':'Add POV / Eminence Document';
+  document.getElementById('modal-body').innerHTML=`<div class="form-grid">
+    <div class="form-group"><label>Client Name *</label><input id="p-client" value="${p.client||''}"/></div>
+    <div class="form-group"><label>POV / Eminence Topic *</label><input id="p-topic" value="${p.topic||''}"/></div>
+    <div class="form-group"><label>Industry</label><select id="p-industry"><option value="">Select…</option>${iO}</select></div>
+    <div class="form-group"><label>Sub-Sector</label><input id="p-subsector" value="${p.subSector||''}"/></div>
+    <div class="form-group"><label>POV Status</label><select id="p-status"><option value="">Select…</option>${sO}</select></div>
+    <div class="form-group"><label>POV Start Date</label><input id="p-start" type="date" value="${p.startDate||''}"/></div>
+    <div class="form-group"><label>US PPMD(s)</label><input id="p-ppmd" value="${p.ppmd||''}"/></div>
+    <div class="form-group"><label>USI POC</label><input id="p-poc" value="${p.usiPOC||''}"/></div>
+    <div class="form-group"><label>Senior Manager</label><input id="p-sm" value="${p.seniorManager||''}"/></div>
+    <div class="form-group"><label>Manager</label><input id="p-mgr" value="${p.manager||''}"/></div>
+    <div class="form-group full"><label>Comments</label><textarea id="p-comments">${p.comments||''}</textarea></div>
+    <div class="form-group full"><label>File Link</label><input id="p-link" value="${p.link||''}"/></div>
+  </div>`;
+  document.getElementById('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" id="pov-save-btn" onclick="savePov()">💾 Save</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+async function savePov(){
+  const client=document.getElementById('p-client').value.trim();
+  const topic=document.getElementById('p-topic').value.trim();
+  if(!client||!topic){showToast('Client and Topic required','error');return;}
+  const row={id:editingPovId||String(Date.now()),client,topic,industry:document.getElementById('p-industry').value,subSector:document.getElementById('p-subsector').value,status:document.getElementById('p-status').value,startDate:document.getElementById('p-start').value,ppmd:document.getElementById('p-ppmd').value,usiPOC:document.getElementById('p-poc').value,seniorManager:document.getElementById('p-sm').value,manager:document.getElementById('p-mgr').value,lastUpdate:today(),comments:document.getElementById('p-comments').value,link:document.getElementById('p-link').value};
+  document.getElementById('pov-save-btn').disabled=true;document.getElementById('pov-save-btn').textContent='Saving…';
+  if(editingPovId){const i=povData.findIndex(x=>x.id===editingPovId);if(i>-1)povData[i]=row;}else povData.push(row);
+  renderPOV();closeModal();
+  try{
+    await ghSave();
+    showToast('POV saved ✓','success');
+  }catch(err){
+    if(editingPovId){const i=povData.findIndex(x=>x.id===row.id);if(i>-1)povData[i]=row;}
+    else povData=povData.filter(x=>x.id!==row.id);
+    renderPOV();
+    showToast('Save failed: '+err.message,'error');
+  }
+}
+async function deletePov(id){
+  if(!confirm('Delete this POV?'))return;
+  const backup=[...povData];povData=povData.filter(p=>p.id!==id);renderPOV();
+  try{await ghSave();showToast('Deleted ✓','success');}
+  catch(err){povData=backup;renderPOV();showToast('Delete failed: '+err.message,'error');}
+}
+
+// ============================================================
+// EXPORT / UI
+// ============================================================
+function exportCSV(){
+  const h=['ID','Client','Industry','Sub-Sector','Pursuit','Capability','RFP Start','Submission','Status','Fee','Proj Start','USI','PPMD','Sr Manager','Manager','USI POC','Team1','Team2','Team3','Last Update','Comments','Link'];
+  const rows=rfpData.filter(r=>r.client).map(r=>[r.id,r.client,r.industry,r.subSector,r.pursuit,r.subCapabilities,r.rfpStart,r.rfpSubmission,r.status,r.fee,r.tentativeStart,r.usiIncluded,r.ppmd,r.seniorManager,r.manager,r.usiPOC,r.team1,r.team2,r.team3,r.lastUpdate,r.comments,r.link].map(v=>`"${(v||'').replace(/"/g,'""')}"`));
+  const csv=[h.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=`RFP_Tracker_PMY27_${today()}.csv`;a.click();
+  showToast('CSV exported ✓','success');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
+function showSection(id,tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');tab.classList.add('active');}
+function initFilters(){
+  const iS=document.getElementById('filter-industry'),cS=document.getElementById('filter-cap');
+  INDUSTRIES.forEach(i=>{const o=document.createElement('option');o.textContent=i;iS.appendChild(o);});
+  CAPABILITIES.forEach(c=>{const o=document.createElement('option');o.textContent=c;cS.appendChild(o);});
+}
+let toastTimer;
+function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',3500);}
+function renderAll(){renderKPIs();renderCharts();renderDeadlines();renderTable();renderPOV();}
+
+// ============================================================
+// BOOT — also need Apps Script to support JSONP callback param
+// ============================================================
+initFilters();
+syncAll(false);
+refreshTimer=setInterval(()=>syncAll(true),REFRESH_MS);
+</script>
+</body>
+</html>
