@@ -481,5 +481,22 @@
       "link": ""
     }
   ],
-  "pov": []
+  "pov": [
+    {
+      "id": "1784621377869",
+      "client": "test",
+      "topic": "test",
+      "industry": "Energy, Resources and Industrials",
+      "subSector": "",
+      "status": "In Progress",
+      "startDate": "",
+      "ppmd": "",
+      "usiPOC": "",
+      "seniorManager": "",
+      "manager": "",
+      "lastUpdate": "2026-07-21",
+      "comments": "",
+      "link": ""
+    }
+  ]
 }
