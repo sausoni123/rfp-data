@@ -771,15 +771,15 @@
     {
       "id": "33",
       "client": "Exxon",
+      "status": "Proposal Submitted",
+      "pursuit": "Exxon Supplier Onboarding and Security Access (SOSA)",
       "industry": "Energy, Resources and Industrials",
       "subSector": "Energy and Chemicals",
-      "pursuit": "Exxon Supplier Onboarding and Security Access (SOSA)",
       "subCapabilities": "Real Estate Transformation",
+      "fee": "$300",
       "rfpStart": "2026-07-27",
       "rfpSubmission": "2026-08-03",
-      "status": "Proposal Submitted",
-      "fee": "$300K",
-      "tentativeStart": "TBD",
+      "tentativeStart": "",
       "usiIncluded": "Yes",
       "ppmd": "Abby Levine",
       "seniorManager": "Akash Kishan",
@@ -788,9 +788,9 @@
       "team1": "Ishita Ahuja",
       "team2": "Vanshika Aggarwal",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-08-06",
       "comments": "",
-      "link": "2026-08-06 00:00:00"
+      "link": ""
     }
   ],
   "pov": [
