@@ -14,7 +14,7 @@
       "tentativeStart": "TBD",
       "usiIncluded": "Yes",
       "ppmd": "David Kaplan",
-      "seniorManager": "None",
+      "seniorManager": "",
       "manager": "Nishant Chokhani",
       "usiPOC": "Nishant Chokhani",
       "team1": "",
@@ -92,7 +92,7 @@
       "team1": "Nikita Rawat",
       "team2": "Pratham Ahuja",
       "team3": "Mohammed Motiwala",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-15",
       "comments": "",
       "link": ""
     },
@@ -163,9 +163,9 @@
       "usiPOC": "Harsh Golyan",
       "team1": "Ishita Ahuja",
       "team2": "Anirudh Sarda",
-      "team3": "Harshit Singh",
-      "lastUpdate": "Priya Makkar",
-      "comments": "Yash Bansal",
+      "team3": "Harshit Singh, Priya Makkar, Yash Bansal",
+      "lastUpdate": "",
+      "comments": "",
       "link": ""
     },
     {
@@ -187,9 +187,9 @@
       "usiPOC": "Harsh Golyan / Akash Singh",
       "team1": "Sanchita Gupta",
       "team2": "Ishita Ahuja",
-      "team3": "Kaushik Saboo",
-      "lastUpdate": "Amoolya Manjunath",
-      "comments": "Vanshika Aggarwal",
+      "team3": "Kaushik Saboo, Amoolya Manjunath, Vanshika Aggarwal",
+      "lastUpdate": "",
+      "comments": "",
       "link": ""
     },
     {
@@ -233,11 +233,11 @@
       "seniorManager": "Reuben Cohen",
       "manager": "Deepak Parmar",
       "usiPOC": "Deepak Parmar",
-      "team1": "--",
-      "team2": "--",
-      "team3": "--",
-      "lastUpdate": "",
-      "comments": "",
+      "team1": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-07-15",
+      "comments": "On Hold, will be revisited in next Quarter - Sep/Oct",
       "link": "https://amedeloitte.sharepoint.com/:p:/r/sites/BMEPC3.0Proposal/Shared%20Documents/General/06.%20WIP%20Response%20Doc/Deloitte%20EPC%20Tool%203.0%20Documentation.pptx?d=w103aa9971e14427c8656297b0f52eee1&csf=1&web=1&e=TNtW9A"
     },
     {
@@ -260,7 +260,7 @@
       "team1": "Keerthana Kalappa",
       "team2": "Manoj Valesha",
       "team3": "Uzair Baig",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-16",
       "comments": "",
       "link": ""
     },
@@ -284,7 +284,7 @@
       "team1": "",
       "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-07",
       "comments": "",
       "link": ""
     },
@@ -308,7 +308,7 @@
       "team1": "Sanchita Gupta",
       "team2": "Yash Bansal",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-15",
       "comments": "",
       "link": ""
     },
@@ -356,7 +356,7 @@
       "team1": "Vanshika Aggarwal",
       "team2": "Ayushi Gupta",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-15",
       "comments": "",
       "link": ""
     },
@@ -403,8 +403,8 @@
       "usiPOC": "Harsh Golyan",
       "team1": "Divashri Agrawal",
       "team2": "Keerthana Kalappa",
-      "team3": "Sanchita Gupta",
-      "lastUpdate": "Ishita Ahuja",
+      "team3": "Sanchita Gupta, Ishita Ahuja",
+      "lastUpdate": "2026-07-15",
       "comments": "",
       "link": ""
     },
@@ -426,9 +426,9 @@
       "manager": "Deepak Parmar",
       "usiPOC": "Deepak Parmar",
       "team1": "Amoolya Manjunath",
-      "team2": "--",
-      "team3": "--",
-      "lastUpdate": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-07-15",
       "comments": "",
       "link": ""
     },
@@ -524,7 +524,7 @@
       "team1": "Nikita Rawat",
       "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-17",
       "comments": "",
       "link": ""
     },
@@ -571,9 +571,9 @@
       "usiPOC": "Yajan Sood",
       "team1": "Mazahir Ladhi",
       "team2": "Sanchita Gupta",
-      "team3": "Ishita Ahuja",
-      "lastUpdate": "Pratham Ahuja",
-      "comments": "Yashovardhan Singh",
+      "team3": "Ishita Ahuja, Pratham Ahuja, Yashovardhan Singh",
+      "lastUpdate": "2026-07-14",
+      "comments": "Orals completed, awaiting results",
       "link": ""
     },
     {
@@ -620,7 +620,7 @@
       "team1": "",
       "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-06-18",
       "comments": "",
       "link": ""
     },
@@ -644,7 +644,7 @@
       "team1": "Ishita Ahuja",
       "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "7/10/2026",
       "comments": "",
       "link": ""
     },
@@ -668,7 +668,7 @@
       "team1": "Prateek Gupta",
       "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-06-18",
       "comments": "",
       "link": ""
     },
@@ -687,12 +687,12 @@
       "usiIncluded": "",
       "ppmd": "Michael Gordon",
       "seniorManager": "Jay Mathes Jr.",
-      "manager": "-",
+      "manager": "",
       "usiPOC": "Prateek Gupta",
-      "team1": "-",
-      "team2": "-",
+      "team1": "",
+      "team2": "",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-04-10",
       "comments": "",
       "link": ""
     },
@@ -716,7 +716,7 @@
       "team1": "Keerthana Kalappa",
       "team2": "Manoj Valesha",
       "team3": "Siddhant Banzal",
-      "lastUpdate": "",
+      "lastUpdate": "2026-07-16",
       "comments": "",
       "link": ""
     },
@@ -740,7 +740,7 @@
       "team1": "Prateek Gupta",
       "team2": "Priya Ramakrishnan",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-08-01",
       "comments": "",
       "link": ""
     },
@@ -788,7 +788,7 @@
       "team1": "Ishita Ahuja",
       "team2": "Vanshika Aggarwal",
       "team3": "",
-      "lastUpdate": "",
+      "lastUpdate": "2026-08-06",
       "comments": "",
       "link": ""
     }
@@ -809,9 +809,9 @@
       "usiPOC": "USI POC",
       "team1": "USI Team Member 1",
       "team2": "USI Team Member 2",
-      "team3": "USI Team Member 3",
-      "lastUpdate": "Last Update Date",
-      "comments": "Comments",
+      "team3": "USI Team Member 3, Last Update Date, Comments",
+      "lastUpdate": "Link (Latest Version of the file)",
+      "comments": "",
       "link": ""
     },
     {
@@ -829,8 +829,8 @@
       "usiPOC": "Nishant Chokhani",
       "team1": "Prateek Gupta",
       "team2": "Priya Ramakrishnan",
-      "team3": "",
-      "lastUpdate": "2026-07-17",
+      "team3": "2026-07-17 00:00:00",
+      "lastUpdate": "",
       "comments": "",
       "link": ""
     },
@@ -847,10 +847,10 @@
       "seniorManager": "Cindy Li",
       "manager": "Harsh Mehta",
       "usiPOC": "Harsh Mehta",
-      "team1": "",
+      "team1": "2026-08-01 00:00:00",
       "team2": "",
       "team3": "",
-      "lastUpdate": "2026-08-01",
+      "lastUpdate": "",
       "comments": "",
       "link": ""
     }
