@@ -815,6 +815,30 @@
       "lastUpdate": "2026-08-11",
       "comments": "",
       "link": ""
+    },
+    {
+      "id": "1786465165886",
+      "client": "abcd",
+      "status": "Identified",
+      "pursuit": "abcd",
+      "industry": "Energy, Resources and Industrials",
+      "subSector": "",
+      "subCapabilities": "",
+      "fee": "",
+      "rfpStart": "",
+      "rfpSubmission": "",
+      "tentativeStart": "",
+      "usiIncluded": "",
+      "ppmd": "",
+      "seniorManager": "",
+      "manager": "",
+      "usiPOC": "sausoni",
+      "team1": "",
+      "team2": "",
+      "team3": "",
+      "lastUpdate": "2026-08-11",
+      "comments": "",
+      "link": ""
     }
   ],
   "pov": [
