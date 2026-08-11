@@ -170,6 +170,7 @@
     </select>
     <select id="filter-industry" onchange="renderTable()"><option value="">All Industries</option></select>
     <select id="filter-cap" onchange="renderTable()"><option value="">All Capabilities</option></select>
+    <select id="filter-poc" onchange="renderTable()"><option value="">All USI POCs</option></select>
     <button class="btn btn-secondary btn-sm" onclick="clearFilters()">Clear</button>
     <span style="margin-left:auto;font-size:12px;color:var(--grey-60)">Click row to view · auto-refreshes every 30s</span>
   </div>
@@ -181,7 +182,6 @@
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
-        <th onclick="sortBy('id')" id="th-id"># ↕</th>
         <th onclick="sortBy('client')" id="th-client">Client ↕</th>
         <th onclick="sortBy('industry')" id="th-industry">Industry ↕</th>
         <th onclick="sortBy('pursuit')" id="th-pursuit">Pursuit Title ↕</th>
@@ -189,7 +189,11 @@
         <th onclick="sortBy('status')" id="th-status">Status ↕</th>
         <th onclick="sortBy('rfpSubmission')" id="th-rfpSubmission">Submission ↕</th>
         <th onclick="sortBy('fee')" id="th-fee">Fee ↕</th>
-        <th>USI POC</th>
+        <th onclick="sortBy('ppmd')" id="th-ppmd">US PPMD ↕</th>
+        <th onclick="sortBy('seniorManager')" id="th-seniorManager">Senior Manager ↕</th>
+        <th onclick="sortBy('manager')" id="th-manager">Manager ↕</th>
+        <th onclick="sortBy('usiPOC')" id="th-usiPOC">USI POC ↕</th>
+        <th>USI Team</th>
         <th onclick="sortBy('lastUpdate')" id="th-lastUpdate">Updated ↕</th>
         <th>Actions</th>
       </tr></thead>
@@ -313,6 +317,7 @@ async function syncAll(silent=false) {
     rfpData = (data.rfp || []);
     povData = (data.pov || []);
     renderAll();
+    updatePocFilter();
     setSyncStatus('ok');
     document.getElementById('auth-banner').className = 'auth-banner hidden';
     if (!silent) showToast('Data refreshed ✓', 'success');
@@ -404,18 +409,31 @@ function renderCharts(){
     iC[ik]=(iC[ik]||0)+1;
     cC[r.subCapabilities||'Other']=(cC[r.subCapabilities||'Other']||0)+1;
   });
-  const SC={'Won':'#00A651','Lost':'#D32F2F','Orals':'#6A1B9A','In- Progress':'#1565C0','On-Hold':'#E65100','Proposal Submitted':'#00796B','Contacted':'#5D4037','Identified':'#37474F'};
-  mk('chart-status','doughnut',Object.keys(sC),Object.values(sC),Object.keys(sC).map(k=>SC[k]||'#999'));
-  mk('chart-industry','bar',Object.keys(iC),Object.values(iC),['#00A651','#1565C0','#6A1B9A','#E65100','#D32F2F','#5D4037']);
-  mk('chart-cap','bar',Object.keys(cC),Object.values(cC),['#00A651','#007A3D','#339966','#66BB99','#99DDBB','#CCEECC']);
+  // Sort all charts descending by value
+  const sortDesc = (obj) => {
+    const entries = Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+    return {labels: entries.map(e=>e[0]), values: entries.map(e=>e[1])};
+  };
+  const ss=sortDesc(sC), si=sortDesc(iC), sc=sortDesc(cC);
+  mk('chart-status','bar',ss.labels,ss.values);
+  mk('chart-industry','bar',si.labels,si.values);
+  mk('chart-cap','bar',sc.labels,sc.values);
 }
-function mk(id,type,labels,data,colors){
+function mk(id,type,labels,data){
   const ctx=document.getElementById(id); if(!ctx)return;
   if(charts[id])charts[id].destroy();
-  charts[id]=new Chart(ctx,{type,data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,borderRadius:type==='bar'?4:0}]},
-    options:{responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{display:type==='doughnut',position:'right',labels:{boxWidth:10,font:{size:10}}}},
-      scales:type==='bar'?{x:{ticks:{font:{size:9}},grid:{display:false}},y:{ticks:{font:{size:10},stepSize:1},grid:{color:'#f0f0f0'}}}:{}}});
+  const GREEN='#00A651';
+  charts[id]=new Chart(ctx,{type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:GREEN,borderWidth:0,borderRadius:4,hoverBackgroundColor:'#007A3D'}]},
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{font:{size:9},maxRotation:35,minRotation:0},grid:{display:false}},
+        y:{ticks:{font:{size:10},stepSize:1},grid:{color:'#f0f0f0'},beginAtZero:true}
+      }
+    }
+  });
 }
 
 // ============================================================
@@ -442,6 +460,7 @@ function filterData(){
   const st=document.getElementById('filter-status')?.value||'';
   const ind=document.getElementById('filter-industry')?.value||'';
   const cap=document.getElementById('filter-cap')?.value||'';
+  const poc=document.getElementById('filter-poc')?.value||'';
   return rfpData.filter(r=>{
     if(!r.client)return false;
     const txt=[r.client,r.industry,r.pursuit,r.subCapabilities,r.usiPOC,r.ppmd,r.manager,r.team1,r.team2,r.team3].join(' ').toLowerCase();
@@ -449,10 +468,11 @@ function filterData(){
     if(st&&r.status!==st)return false;
     if(ind&&r.industry!==ind)return false;
     if(cap&&r.subCapabilities!==cap)return false;
+    if(poc&&r.usiPOC!==poc)return false;
     return true;
   });
 }
-function clearFilters(){['search','filter-status','filter-industry','filter-cap'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderTable();}
+function clearFilters(){['search','filter-status','filter-industry','filter-cap','filter-poc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderTable();}
 function sortBy(col){
   if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
   document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted'));
@@ -465,19 +485,21 @@ function renderTable(){
   const tb=document.getElementById('rfp-tbody');
   if(!data.length){tb.innerHTML=`<tr><td colspan="11" class="no-rows">No RFPs match filters</td></tr>`;return;}
   tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')">
-    <td style="color:var(--grey-60)">${r.id}</td>
     <td class="td-client">${r.client}</td>
-    <td><span class="tag">${(r.industry||'').split(',')[0].split(' ')[0]}</span></td>
+    <td style="font-size:12px">${r.industry||'—'}</td>
     <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
     <td><span class="tag">${r.subCapabilities||'—'}</span></td>
     <td>${badge(r.status)}</td>
     <td style="white-space:nowrap;font-size:12px">${r.rfpSubmission||'—'}</td>
     <td style="font-weight:600;color:var(--green-dark)">${r.fee||'—'}</td>
-    <td style="font-size:12px">${r.usiPOC||'—'}</td>
+    <td style="font-size:12px">${r.ppmd||'—'}</td>
+    <td style="font-size:12px">${r.seniorManager||'—'}</td>
+    <td style="font-size:12px">${r.manager||'—'}</td>
+    <td style="font-size:12px;font-weight:600">${r.usiPOC||'—'}</td>
+    <td style="font-size:12px">${[r.team1,r.team2,r.team3].filter(t=>t&&t!=='--'&&t!=='-').join(', ')||'—'}</td>
     <td style="color:var(--grey-60);font-size:12px">${r.lastUpdate||'—'}</td>
-    <td onclick="event.stopPropagation()" style="white-space:nowrap">
+    <td onclick="event.stopPropagation()">
       <button class="btn btn-sm btn-secondary" onclick="editRFP('${r.id}')">Edit</button>
-      <button class="btn btn-sm btn-danger" onclick="deleteRFP('${r.id}')">Del</button>
     </td></tr>`).join('');
 }
 
@@ -538,7 +560,7 @@ function openRFPForm(r){
     <div class="form-group"><label>US PPMD(s)</label><input id="f-ppmd" value="${r.ppmd||''}"/></div>
     <div class="form-group"><label>Senior Manager(s)</label><input id="f-sm" value="${r.seniorManager||''}"/></div>
     <div class="form-group"><label>Manager(s)</label><input id="f-mgr" value="${r.manager||''}"/></div>
-    <div class="form-group"><label>USI POC</label><input id="f-poc" value="${r.usiPOC||''}"/></div>
+    <div class="form-group"><label>USI POC *</label><input id="f-poc" value="${r.usiPOC||''}"/></div>
     <div class="form-group"><label>USI Team Member 1</label><input id="f-t1" value="${r.team1||''}"/></div>
     <div class="form-group"><label>USI Team Member 2</label><input id="f-t2" value="${r.team2||''}"/></div>
     <div class="form-group"><label>USI Team Member 3</label><input id="f-t3" value="${r.team3||''}"/></div>
@@ -553,7 +575,8 @@ async function saveRFP(){
   const client=document.getElementById('f-client').value.trim();
   const status=document.getElementById('f-status').value;
   const pursuit=document.getElementById('f-pursuit').value.trim();
-  if(!client||!status||!pursuit){showToast('Client, Status, and Pursuit are required','error');return;}
+  const usiPOC=document.getElementById('f-poc').value.trim();
+  if(!client||!status||!pursuit||!usiPOC){showToast('Client, Status, Pursuit and USI POC are required','error');return;}
   const row={
     id:editingId||String(Date.now()),client,status,pursuit,
     industry:document.getElementById('f-industry').value,
@@ -650,7 +673,7 @@ function openPovForm(p){
     <div class="form-group"><label>POV Status</label><select id="p-status"><option value="">Select…</option>${sO}</select></div>
     <div class="form-group"><label>POV Start Date</label><input id="p-start" type="date" value="${p.startDate||''}"/></div>
     <div class="form-group"><label>US PPMD(s)</label><input id="p-ppmd" value="${p.ppmd||''}"/></div>
-    <div class="form-group"><label>USI POC</label><input id="p-poc" value="${p.usiPOC||''}"/></div>
+    <div class="form-group"><label>USI POC *</label><input id="p-poc" value="${p.usiPOC||''}"/></div>
     <div class="form-group"><label>Senior Manager</label><input id="p-sm" value="${p.seniorManager||''}"/></div>
     <div class="form-group"><label>Manager</label><input id="p-mgr" value="${p.manager||''}"/></div>
     <div class="form-group full"><label>Comments</label><textarea id="p-comments">${p.comments||''}</textarea></div>
@@ -662,7 +685,8 @@ function openPovForm(p){
 async function savePov(){
   const client=document.getElementById('p-client').value.trim();
   const topic=document.getElementById('p-topic').value.trim();
-  if(!client||!topic){showToast('Client and Topic required','error');return;}
+  const povPOC=document.getElementById('p-poc').value.trim();
+  if(!client||!topic||!povPOC){showToast('Client, Topic and USI POC are required','error');return;}
   const row={id:editingPovId||String(Date.now()),client,topic,industry:document.getElementById('p-industry').value,subSector:document.getElementById('p-subsector').value,status:document.getElementById('p-status').value,startDate:document.getElementById('p-start').value,ppmd:document.getElementById('p-ppmd').value,usiPOC:document.getElementById('p-poc').value,seniorManager:document.getElementById('p-sm').value,manager:document.getElementById('p-mgr').value,lastUpdate:today(),comments:document.getElementById('p-comments').value,link:document.getElementById('p-link').value};
   document.getElementById('pov-save-btn').disabled=true;document.getElementById('pov-save-btn').textContent='Saving…';
   if(editingPovId){const i=povData.findIndex(x=>x.id===editingPovId);if(i>-1)povData[i]=row;}else povData.push(row);
@@ -701,6 +725,14 @@ function initFilters(){
   const iS=document.getElementById('filter-industry'),cS=document.getElementById('filter-cap');
   INDUSTRIES.forEach(i=>{const o=document.createElement('option');o.textContent=i;iS.appendChild(o);});
   CAPABILITIES.forEach(c=>{const o=document.createElement('option');o.textContent=c;cS.appendChild(o);});
+}
+function updatePocFilter(){
+  const pS=document.getElementById('filter-poc');
+  const current=pS.value;
+  pS.innerHTML='<option value="">All USI POCs</option>';
+  const pocs=[...new Set(rfpData.map(r=>r.usiPOC).filter(p=>p&&p!=='—'))].sort();
+  pocs.forEach(p=>{const o=document.createElement('option');o.textContent=p;o.value=p;pS.appendChild(o);});
+  pS.value=current;
 }
 let toastTimer;
 function showToast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',3500);}
