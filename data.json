@@ -791,30 +791,6 @@
       "lastUpdate": "2026-08-06",
       "comments": "",
       "link": ""
-    },
-    {
-      "id": "1786439011228",
-      "client": "Test",
-      "status": "Identified",
-      "pursuit": "ABC",
-      "industry": "Consumer",
-      "subSector": "Automotive",
-      "subCapabilities": "Project Delivery",
-      "fee": "$2100.0M",
-      "rfpStart": "2026-08-11",
-      "rfpSubmission": "2026-08-19",
-      "tentativeStart": "",
-      "usiIncluded": "",
-      "ppmd": "",
-      "seniorManager": "",
-      "manager": "",
-      "usiPOC": "",
-      "team1": "",
-      "team2": "",
-      "team3": "",
-      "lastUpdate": "2026-08-11",
-      "comments": "",
-      "link": ""
     }
   ],
   "pov": [
