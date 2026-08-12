@@ -349,7 +349,11 @@ function manualRefresh() {
 // ============================================================
 // HELPERS
 // ============================================================
-function bkey(s){ return (s||'').replace(/[\s\-]+/g,'').replace('InInProgress','InProgress').replace('Progress','InProgress'); }
+function bkey(s){ 
+  const clean=(s||'').replace(/\s+/g,' ').trim();
+  if(clean==='In- Progress'||clean==='In-Progress'||clean==='In Progress') return 'InProgress';
+  return clean.replace(/[\s\-]+/g,'');
+}
 function badge(s){ return `<span class="badge b-${bkey(s)}">${s||'Unknown'}</span>`; }
 function daysLeft(d){ if(!d||d==='TBD')return null; const dt=new Date(d); if(isNaN(dt))return null; return Math.ceil((dt-new Date())/86400000); }
 function deadlineEl(d){ const n=daysLeft(d); if(n===null)return '<span class="dl-ok">—</span>'; if(n<0)return `<span class="dl-red">⚠ ${Math.abs(n)}d overdue</span>`; if(n<=7)return `<span class="dl-red">🔴 ${n}d</span>`; if(n<=21)return `<span class="dl-amber">🟡 ${n}d</span>`; return `<span class="dl-ok">${n}d</span>`; }
@@ -405,9 +409,10 @@ function renderCharts(){
   const sC={},iC={},cC={};
   a.forEach(r=>{
     sC[r.status||'Unknown']=(sC[r.status||'Unknown']||0)+1;
-    const ik=(r.industry||'Other').split(',')[0].trim().split(' ').slice(0,2).join(' ');
+    const ik=(r.industry||'Other').trim();
     iC[ik]=(iC[ik]||0)+1;
-    cC[r.subCapabilities||'Other']=(cC[r.subCapabilities||'Other']||0)+1;
+    const ck = r.subCapabilities||'Other';
+    cC[ck]=(cC[ck]||0)+1;
   });
   // Sort all charts descending by value
   const sortDesc = (obj) => {
@@ -486,7 +491,7 @@ function renderTable(){
   if(!data.length){tb.innerHTML=`<tr><td colspan="11" class="no-rows">No RFPs match filters</td></tr>`;return;}
   tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')">
     <td class="td-client">${r.client}</td>
-    <td style="font-size:12px">${r.industry||'—'}</td>
+    <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.industry||''}">${r.industry||'—'}</td>
     <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
     <td><span class="tag">${r.subCapabilities||'—'}</span></td>
     <td>${badge(r.status)}</td>
@@ -638,23 +643,25 @@ function renderPOV(){
   }
   c.innerHTML=`<div class="table-wrap"><div style="overflow-x:auto"><table>
     <thead><tr>
-      <th>#</th><th>Client</th><th>Industry</th><th>Topic</th><th>Sub-Capability</th>
-      <th>Status</th><th>Start Date</th><th>USI POC</th><th>PPMD</th><th>Comments</th><th>Actions</th>
+      <th>Client</th><th>Industry</th><th>Topic</th><th>Capability</th>
+      <th>Status</th><th>Start Date</th><th>US PPMD</th><th>Senior Manager</th><th>Manager</th><th>USI POC</th><th>USI Team</th><th>Last Updated</th><th>Comments</th><th>Actions</th>
     </tr></thead>
     <tbody>${povData.map((p,i)=>`<tr>
-      <td style="color:var(--grey-60)">${i+1}</td>
       <td class="td-client">${p.client||'—'}</td>
-      <td><span class="tag">${(p.industry||'').split(',')[0].split(' ')[0]||'—'}</span></td>
+      <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.industry||''}">${p.industry||'—'}</td>
       <td class="td-pursuit" title="${p.topic||''}">${p.topic||'—'}</td>
       <td><span class="tag">${p.subCapabilities||'—'}</span></td>
       <td>${badge(p.status)}</td>
       <td style="font-size:12px;white-space:nowrap">${fmtDate(p.startDate)}</td>
-      <td style="font-size:12px">${p.usiPOC||'—'}</td>
       <td style="font-size:12px">${p.ppmd||'—'}</td>
+      <td style="font-size:12px">${p.seniorManager||'—'}</td>
+      <td style="font-size:12px">${p.manager||'—'}</td>
+      <td style="font-size:12px;font-weight:600">${p.usiPOC||'—'}</td>
+      <td style="font-size:12px">${[p.team1,p.team2,p.team3].filter(t=>t&&t!=='--'&&t!=='-').join(', ')||'—'}</td>
+      <td style="font-size:12px;color:var(--grey-60)">${fmtDate(p.lastUpdate)}</td>
       <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.comments||''}">${p.comments||'—'}</td>
-      <td onclick="event.stopPropagation()" style="white-space:nowrap">
+      <td onclick="event.stopPropagation()">
         <button class="btn btn-sm btn-secondary" onclick="editPov('${p.id}')">Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deletePov('${p.id}')">Del</button>
       </td>
     </tr>`).join('')}</tbody>
   </table></div></div>`;
