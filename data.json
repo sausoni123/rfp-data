@@ -795,26 +795,6 @@
   ],
   "pov": [
     {
-      "id": "Sr. No",
-      "client": "Client Name",
-      "industry": "Industry",
-      "subSector": "Sub - Sector",
-      "topic": "POV/Eminence Topic",
-      "subCapabilities": "Sub-Capabilities",
-      "startDate": "POV Start Date",
-      "status": "POV Status",
-      "ppmd": "US PPMD(s)",
-      "seniorManager": "US/USI Senior Manager(s)",
-      "manager": "US/USI Manager(s)",
-      "usiPOC": "USI POC",
-      "team1": "USI Team Member 1",
-      "team2": "USI Team Member 2",
-      "team3": "USI Team Member 3, Last Update Date, Comments",
-      "lastUpdate": "Link (Latest Version of the file)",
-      "comments": "",
-      "link": ""
-    },
-    {
       "id": "1",
       "client": "Liberty Mutual",
       "industry": "Financial Services",
