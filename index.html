@@ -498,7 +498,7 @@ function renderTable(){
   const tb=document.getElementById('rfp-tbody');
   if(!data.length){tb.innerHTML=`<tr><td colspan="11" class="no-rows">No RFPs match filters</td></tr>`;return;}
   tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')" style="cursor:pointer">
-    <td style="width:32px;text-align:center;color:var(--grey-60);font-size:14px" title="Click to view / edit">✏️</td>
+    <td onclick="event.stopPropagation();editRFP('${r.id}')" style="width:32px;text-align:center;font-size:15px;cursor:pointer" title="Edit this RFP">✏️</td>
     <td class="td-client">${r.client}</td>
     <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.industry||''}">${r.industry||'—'}</td>
     <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
