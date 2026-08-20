@@ -395,7 +395,7 @@ function renderKPIs(){
   document.getElementById('kpi-row').innerHTML=`
     <div class="kpi c-green"><div class="kpi-num">${a.length}</div><div class="kpi-label">Total RFPs</div></div>
     <div class="kpi c-blue"><div class="kpi-num">${active}</div><div class="kpi-label">Active Pipeline</div><div class="kpi-sub">In Progress / Orals</div></div>
-    <div class="kpi c-won"><div class="kpi-num">${won}</div><div class="kpi-label">Won</div><div class="kpi-sub">Win rate: ${wr}%</div></div>
+    <div class="kpi c-won"><div class="kpi-num">${won}</div><div class="kpi-label">Won</div></div>
     <div class="kpi c-lost"><div class="kpi-num">${lost}</div><div class="kpi-label">Lost</div></div>
     <div class="kpi c-hold"><div class="kpi-num">${hold}</div><div class="kpi-label">On Hold</div></div>`;
 }
@@ -409,7 +409,15 @@ function renderCharts(){
   const sC={},iC={},cC={};
   a.forEach(r=>{
     sC[r.status||'Unknown']=(sC[r.status||'Unknown']||0)+1;
-    const ik=(r.industry||'Other').trim();
+    const industryShort = {
+      'Energy, Resources and Industrials': 'ER&I',
+      'Technology, Media and Telecommunications': 'TMT',
+      'Government and Public Services': 'GPS',
+      'Financial Services': 'FS',
+      'Life Sciences and Health Care': 'LS&HC',
+      'Consumer': 'Consumer'
+    };
+    const ik = industryShort[r.industry] || r.industry || 'Other';
     iC[ik]=(iC[ik]||0)+1;
     const ck = r.subCapabilities||'Other';
     cC[ck]=(cC[ck]||0)+1;
