@@ -650,10 +650,12 @@ function renderPOV(){
   }
   c.innerHTML=`<div class="table-wrap"><div style="overflow-x:auto"><table>
     <thead><tr>
+      <th style="width:32px"></th>
       <th>Client</th><th>Industry</th><th>Topic</th><th>Capability</th>
-      <th>Status</th><th>Start Date</th><th>US PPMD</th><th>Senior Manager</th><th>Manager</th><th>USI POC</th><th>USI Team</th><th>Last Updated</th><th>Comments</th><th>Edit</th>
+      <th>Status</th><th>Start Date</th><th>US PPMD</th><th>Senior Manager</th><th>Manager</th><th>USI POC</th><th>USI Team</th><th>Last Updated</th><th>Comments</th>
     </tr></thead>
-    <tbody>${povData.map((p,i)=>`<tr>
+    <tbody>${povData.map((p,i)=>`<tr onclick="viewPOV('${p.id}')" style="cursor:pointer">
+      <td onclick="event.stopPropagation();editPov('${p.id}')" style="width:32px;text-align:center;font-size:15px;cursor:pointer" title="Edit this POV">✏️</td>
       <td class="td-client">${p.client||'—'}</td>
       <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.industry||''}">${p.industry||'—'}</td>
       <td class="td-pursuit" title="${p.topic||''}">${p.topic||'—'}</td>
@@ -667,14 +669,36 @@ function renderPOV(){
       <td style="font-size:12px">${[p.team1,p.team2,p.team3].filter(t=>t&&t!=='--'&&t!=='-').join(', ')||'—'}</td>
       <td style="font-size:12px;color:var(--grey-60)">${fmtDate(p.lastUpdate)}</td>
       <td style="font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${p.comments||''}">${p.comments||'—'}</td>
-      <td onclick="event.stopPropagation()">
-        <button class="btn btn-sm btn-secondary" onclick="editPov('${p.id}')">Edit</button>
-      </td>
     </tr>`).join('')}</tbody>
   </table></div></div>`;
 }
 function openAddPovModal(){editingPovId=null;openPovForm({});}
-function editPov(id){editingPovId=id;openPovForm(povData.find(x=>x.id===id)||{});}
+function viewPOV(id){
+  const p=povData.find(x=>x.id===id); if(!p) return;
+  document.getElementById('modal-title').textContent=`${p.client} — ${p.topic||'POV'}`;
+  document.getElementById('modal-body').innerHTML=`<div class="detail-grid">
+    <div class="detail-section">POV Details</div>
+    <div class="detail-group"><div class="detail-label">Client</div><div class="detail-value">${p.client||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Status</div><div class="detail-value">${badge(p.status)}</div></div>
+    <div class="detail-group full"><div class="detail-label">Topic</div><div class="detail-value">${p.topic||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Industry</div><div class="detail-value">${p.industry||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Sub-Sector</div><div class="detail-value">${p.subSector||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Capability</div><div class="detail-value">${p.subCapabilities||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Start Date</div><div class="detail-value">${p.startDate||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Last Updated</div><div class="detail-value">${p.lastUpdate||'—'}</div></div>
+    <div class="detail-section">Team</div>
+    <div class="detail-group"><div class="detail-label">US PPMD</div><div class="detail-value">${p.ppmd||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Senior Manager</div><div class="detail-value">${p.seniorManager||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">Manager</div><div class="detail-value">${p.manager||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">USI POC</div><div class="detail-value">${p.usiPOC||'—'}</div></div>
+    <div class="detail-group"><div class="detail-label">USI Team</div><div class="detail-value">${[p.team1,p.team2,p.team3].filter(t=>t&&t!=='--').join(' · ')||'—'}</div></div>
+    ${p.comments?`<div class="detail-group full"><div class="detail-label">Comments</div><div class="detail-value">${p.comments}</div></div>`:''}
+    ${p.link?`<div class="detail-group full"><div class="detail-label">File Link</div><div class="detail-value"><a href="${p.link}" target="_blank" style="color:var(--green)">${p.link}</a></div></div>`:''}
+  </div>`;
+  document.getElementById('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="editPov('${p.id}')">Edit</button>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function editPov(id){editingPovId=id;closeModal();setTimeout(()=>openPovForm(povData.find(x=>x.id===id)||{}),100);}
 function openPovForm(p){
   const sO=['Not Started','In Progress','Completed'].map(s=>`<option${p.status===s?' selected':''}>${s}</option>`).join('');
   const iO=INDUSTRIES.map(i=>`<option${p.industry===i?' selected':''}>${i}</option>`).join('');
