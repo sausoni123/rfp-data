@@ -182,6 +182,7 @@
     <div style="overflow-x:auto">
     <table>
       <thead><tr>
+        <th style="width:32px"></th>
         <th onclick="sortBy('client')" id="th-client">Client ↕</th>
         <th onclick="sortBy('industry')" id="th-industry">Industry ↕</th>
         <th onclick="sortBy('pursuit')" id="th-pursuit">Pursuit Title ↕</th>
@@ -195,7 +196,6 @@
         <th onclick="sortBy('usiPOC')" id="th-usiPOC">USI POC ↕</th>
         <th>USI Team</th>
         <th onclick="sortBy('lastUpdate')" id="th-lastUpdate">Updated ↕</th>
-        <th>Actions</th>
       </tr></thead>
       <tbody id="rfp-tbody"><tr><td colspan="11" class="no-rows">Loading…</td></tr></tbody>
     </table>
@@ -497,7 +497,8 @@ function renderTable(){
   document.getElementById('table-count').textContent=`${data.length} RFP${data.length!==1?'s':''}`;
   const tb=document.getElementById('rfp-tbody');
   if(!data.length){tb.innerHTML=`<tr><td colspan="11" class="no-rows">No RFPs match filters</td></tr>`;return;}
-  tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')">
+  tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')" style="cursor:pointer">
+    <td style="width:32px;text-align:center;color:var(--grey-60);font-size:14px" title="Click to view / edit">✏️</td>
     <td class="td-client">${r.client}</td>
     <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.industry||''}">${r.industry||'—'}</td>
     <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
@@ -511,9 +512,7 @@ function renderTable(){
     <td style="font-size:12px;font-weight:600">${r.usiPOC||'—'}</td>
     <td style="font-size:12px">${[r.team1,r.team2,r.team3].filter(t=>t&&t!=='--'&&t!=='-').join(', ')||'—'}</td>
     <td style="color:var(--grey-60);font-size:12px">${r.lastUpdate||'—'}</td>
-    <td onclick="event.stopPropagation()">
-      <button class="btn btn-sm btn-secondary" onclick="editRFP('${r.id}')">Edit</button>
-    </td></tr>`).join('');
+    </tr>`).join('');
 }
 
 // ============================================================
@@ -652,7 +651,7 @@ function renderPOV(){
   c.innerHTML=`<div class="table-wrap"><div style="overflow-x:auto"><table>
     <thead><tr>
       <th>Client</th><th>Industry</th><th>Topic</th><th>Capability</th>
-      <th>Status</th><th>Start Date</th><th>US PPMD</th><th>Senior Manager</th><th>Manager</th><th>USI POC</th><th>USI Team</th><th>Last Updated</th><th>Comments</th><th>Actions</th>
+      <th>Status</th><th>Start Date</th><th>US PPMD</th><th>Senior Manager</th><th>Manager</th><th>USI POC</th><th>USI Team</th><th>Last Updated</th><th>Comments</th><th>Edit</th>
     </tr></thead>
     <tbody>${povData.map((p,i)=>`<tr>
       <td class="td-client">${p.client||'—'}</td>
