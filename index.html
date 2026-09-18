@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>I&RE Market & Growth — RFP Tracker PMY27</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <style>
   :root {
     --green:#00A651;--green-dark:#007A3D;--green-light:#E6F7EE;
@@ -54,9 +55,21 @@
   .filter-bar input,.filter-bar select{padding:7px 11px;border:1px solid var(--grey-30);border-radius:4px;font-size:13px;background:var(--grey-10);}
   .filter-bar input:focus,.filter-bar select:focus{outline:2px solid var(--green);}
   .filter-bar input{min-width:200px;}
+  .filter-active{border:2px solid var(--green)!important;background:var(--green-light)!important;font-weight:600;}
   .table-wrap{background:var(--white);border-radius:8px;box-shadow:var(--shadow);overflow:hidden;}
   .table-header{padding:14px 20px;border-bottom:1px solid var(--grey-10);display:flex;align-items:center;justify-content:space-between;}
-  table{width:100%;border-collapse:collapse;}
+  table{width:100%;border-collapse:collapse;table-layout:auto;}
+  .col-pencil{width:32px;}
+  .col-client{min-width:120px;max-width:160px;}
+  .col-industry{min-width:130px;max-width:180px;}
+  .col-pursuit{min-width:160px;max-width:220px;}
+  .col-cap{min-width:100px;max-width:140px;}
+  .col-status{min-width:100px;}
+  .col-date{min-width:90px;max-width:110px;white-space:nowrap;}
+  .col-fee{min-width:70px;max-width:90px;}
+  .col-person{min-width:110px;max-width:150px;}
+  .col-team{min-width:180px;max-width:250px;}
+  .col-updated{min-width:85px;max-width:100px;}
   thead th{background:var(--grey-90);color:var(--white);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;}
   thead th:hover{background:#333;}thead th.sorted{color:var(--green);}
   tbody tr{border-bottom:1px solid var(--grey-10);transition:background .1s;}
@@ -139,6 +152,26 @@
 <div class="container">
 
 <div class="section active" id="dashboard">
+  <div class="filter-bar" style="margin-bottom:20px">
+    <input type="text" id="dash-search" placeholder="Search client, pursuit, team…" oninput="renderAll();highlightActiveFilters()"/>
+    <select id="dash-status" onchange="renderAll();highlightActiveFilters()">
+      <option value="">All Statuses</option>
+      <option>Won</option><option>Lost</option><option>Orals</option>
+      <option>In- Progress</option><option>On-Hold</option>
+      <option>Proposal Submitted</option><option>Contacted</option>
+      <option>Identified</option><option>Verbal Commitment</option><option>Re-Opened</option>
+    </select>
+    <select id="dash-industry" onchange="renderAll();highlightActiveFilters()">
+      <option value="">All Industries</option>
+    </select>
+    <select id="dash-cap" onchange="renderAll();highlightActiveFilters()">
+      <option value="">All Capabilities</option>
+      <option>Real Estate Technology</option>
+      <option>Real Estate Transformation</option>
+      <option>Capital Project</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="clearDashFilters()">Clear</button>
+  </div>
   <div class="kpi-row" id="kpi-row">
     <div class="kpi c-green"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Total RFPs</div></div>
     <div class="kpi c-blue"><div class="skeleton" style="width:60px;height:32px;margin-bottom:8px"></div><div class="kpi-label">Active</div></div>
@@ -160,17 +193,17 @@
 
 <div class="section" id="rfp-list">
   <div class="filter-bar">
-    <input type="text" id="search" placeholder="Search client, pursuit, team…" oninput="renderTable()"/>
-    <select id="filter-status" onchange="renderTable()">
+    <input type="text" id="search" placeholder="Search client, pursuit, team…" oninput="renderTable();highlightActiveFilters()"/>
+    <select id="filter-status" onchange="renderTable();highlightActiveFilters()">
       <option value="">All Statuses</option>
       <option>Won</option><option>Lost</option><option>Orals</option>
       <option>In- Progress</option><option>On-Hold</option>
       <option>Proposal Submitted</option><option>Contacted</option>
       <option>Identified</option><option>Verbal Commitment</option><option>Re-Opened</option>
     </select>
-    <select id="filter-industry" onchange="renderTable()"><option value="">All Industries</option></select>
-    <select id="filter-cap" onchange="renderTable()"><option value="">All Capabilities</option></select>
-    <select id="filter-poc" onchange="renderTable()"><option value="">All USI POCs</option></select>
+    <select id="filter-industry" onchange="renderTable();highlightActiveFilters()"><option value="">All Industries</option></select>
+    <select id="filter-cap" onchange="renderTable();highlightActiveFilters()"><option value="">All Capabilities</option></select>
+    <select id="filter-poc" onchange="renderTable();highlightActiveFilters()"><option value="">All USI POCs</option></select>
     <button class="btn btn-secondary btn-sm" onclick="clearFilters()">Clear</button>
     <span style="margin-left:auto;font-size:12px;color:var(--grey-60)">Click row to view · auto-refreshes every 30s</span>
   </div>
@@ -387,7 +420,7 @@ function fmtDate(val) {
 // KPI
 // ============================================================
 function renderKPIs(){
-  const a=rfpData.filter(r=>r.client);
+  const a=filterData('dash').filter(r=>r.client);
   const won=a.filter(r=>r.status==='Won').length, lost=a.filter(r=>r.status==='Lost').length;
   const active=a.filter(r=>['In- Progress','Orals','Proposal Submitted','Contacted','Identified'].includes(r.status)).length;
   const hold=a.filter(r=>r.status==='On-Hold').length;
@@ -405,7 +438,7 @@ function renderKPIs(){
 // ============================================================
 const charts={};
 function renderCharts(){
-  const a=rfpData.filter(r=>r.client);
+  const a=filterData('dash').filter(r=>r.client);
   const sC={},iC={},cC={};
   a.forEach(r=>{
     sC[r.status||'Unknown']=(sC[r.status||'Unknown']||0)+1;
@@ -422,30 +455,48 @@ function renderCharts(){
     const ck = r.subCapabilities||'Other';
     cC[ck]=(cC[ck]||0)+1;
   });
-  // Sort all charts descending by value
+  // Status: sort by lifecycle sequence
+  const STATUS_ORDER = ['Contacted','Identified','In- Progress','Proposal Submitted','Orals','Verbal Commitment','Won','Lost','On-Hold'];
+  const statusEntries = STATUS_ORDER.filter(s=>sC[s]).map(s=>[s,sC[s]]);
+  // add any unknown statuses at end
+  Object.entries(sC).forEach(([s,n])=>{ if(!STATUS_ORDER.includes(s)) statusEntries.push([s,n]); });
+  const ss = {labels: statusEntries.map(e=>e[0]), values: statusEntries.map(e=>e[1])};
+
+  // Industry & Capability: sort descending by count
   const sortDesc = (obj) => {
     const entries = Object.entries(obj).sort((a,b)=>b[1]-a[1]);
     return {labels: entries.map(e=>e[0]), values: entries.map(e=>e[1])};
   };
-  const ss=sortDesc(sC), si=sortDesc(iC), sc=sortDesc(cC);
-  mk('chart-status','bar',ss.labels,ss.values);
-  mk('chart-industry','bar',si.labels,si.values);
-  mk('chart-cap','bar',sc.labels,sc.values);
+  const si=sortDesc(iC), sc=sortDesc(cC);
+  mk('chart-status','bar',ss.labels,ss.values,'#1565C0');
+  mk('chart-industry','bar',si.labels,si.values,'#00A651');
+  mk('chart-cap','bar',sc.labels,sc.values,'#6A1B9A');
 }
-function mk(id,type,labels,data){
+function mk(id,type,labels,data,color){
   const ctx=document.getElementById(id); if(!ctx)return;
   if(charts[id])charts[id].destroy();
-  const GREEN='#00A651';
+  const COL = color || '#00A651';
+  const hover = COL === '#00A651' ? '#007A3D' : COL + 'CC';
   charts[id]=new Chart(ctx,{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:GREEN,borderWidth:0,borderRadius:4,hoverBackgroundColor:'#007A3D'}]},
+    data:{labels,datasets:[{data,backgroundColor:COL,borderWidth:0,borderRadius:4,hoverBackgroundColor:hover}]},
     options:{
       responsive:true,maintainAspectRatio:true,
-      plugins:{legend:{display:false}},
+      plugins:{
+        legend:{display:false},
+        datalabels:{
+          anchor:'end', align:'end',
+          color:'#333',
+          font:{size:10, weight:'bold'},
+          formatter: v => v
+        }
+      },
       scales:{
         x:{ticks:{font:{size:9},maxRotation:35,minRotation:0},grid:{display:false}},
-        y:{ticks:{font:{size:10},stepSize:1},grid:{color:'#f0f0f0'},beginAtZero:true}
+        y:{ticks:{font:{size:10},stepSize:1},grid:{color:'#f0f0f0'},beginAtZero:true,
+           grace:'15%'}
       }
-    }
+    },
+    plugins:[ChartDataLabels]
   });
 }
 
@@ -468,12 +519,14 @@ function renderDeadlines(){
 // ============================================================
 // TABLE
 // ============================================================
-function filterData(){
-  const q=(document.getElementById('search')?.value||'').toLowerCase();
-  const st=document.getElementById('filter-status')?.value||'';
-  const ind=document.getElementById('filter-industry')?.value||'';
-  const cap=document.getElementById('filter-cap')?.value||'';
-  const poc=document.getElementById('filter-poc')?.value||'';
+function filterData(src){
+  // src='dash' uses dashboard filters, else uses RFP tracker filters
+  const isDash = src==='dash';
+  const q=((isDash ? document.getElementById('dash-search') : document.getElementById('search'))?.value||'').toLowerCase();
+  const st=((isDash ? document.getElementById('dash-status') : document.getElementById('filter-status'))?.value||'');
+  const ind=((isDash ? document.getElementById('dash-industry') : document.getElementById('filter-industry'))?.value||'');
+  const cap=((isDash ? document.getElementById('dash-cap') : document.getElementById('filter-cap'))?.value||'');
+  const poc=(!isDash && document.getElementById('filter-poc')?.value)||'';
   return rfpData.filter(r=>{
     if(!r.client)return false;
     const txt=[r.client,r.industry,r.pursuit,r.subCapabilities,r.usiPOC,r.ppmd,r.manager,r.team1,r.team2,r.team3].join(' ').toLowerCase();
@@ -485,7 +538,24 @@ function filterData(){
     return true;
   });
 }
-function clearFilters(){['search','filter-status','filter-industry','filter-cap','filter-poc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});renderTable();}
+function clearFilters(){
+  ['search','filter-status','filter-industry','filter-cap','filter-poc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  highlightActiveFilters();
+  renderTable();
+}
+function clearDashFilters(){
+  ['dash-search','dash-status','dash-industry','dash-cap'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  highlightActiveFilters();
+  renderAll();
+}
+function highlightActiveFilters(){
+  ['search','filter-status','filter-industry','filter-cap','filter-poc',
+   'dash-search','dash-status','dash-industry','dash-cap'].forEach(id=>{
+    const e=document.getElementById(id); if(!e) return;
+    if(e.value && e.value!=='') e.classList.add('filter-active');
+    else e.classList.remove('filter-active');
+  });
+}
 function sortBy(col){
   if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}
   document.querySelectorAll('thead th').forEach(t=>t.classList.remove('sorted'));
@@ -500,8 +570,8 @@ function renderTable(){
   tb.innerHTML=data.map(r=>`<tr onclick="viewRFP('${r.id}')" style="cursor:pointer">
     <td onclick="event.stopPropagation();editRFP('${r.id}')" style="width:32px;text-align:center;font-size:15px;cursor:pointer" title="Edit this RFP">✏️</td>
     <td class="td-client">${r.client}</td>
-    <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.industry||''}">${r.industry||'—'}</td>
-    <td class="td-pursuit" title="${r.pursuit}">${r.pursuit}</td>
+    <td style="font-size:11px;max-width:160px;white-space:normal;word-wrap:break-word;line-height:1.3">${r.industry||'—'}</td>
+    <td style="font-size:12px;max-width:200px;white-space:normal;word-wrap:break-word;line-height:1.3;color:var(--grey-60)" title="${r.pursuit}">${r.pursuit}</td>
     <td><span class="tag">${r.subCapabilities||'—'}</span></td>
     <td>${badge(r.status)}</td>
     <td style="white-space:nowrap;font-size:12px">${r.rfpSubmission||'—'}</td>
@@ -758,10 +828,40 @@ function exportCSV(){
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
 document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal();});
-function showSection(id,tab){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');tab.classList.add('active');}
+function showSection(id,tab){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  tab.classList.add('active');
+  // Sync filters when switching to RFP Tracker
+  if(id==='rfp-list') syncFiltersToTable();
+  if(id==='dashboard') syncFiltersToDashboard();
+}
+function syncFiltersToTable(){
+  const q=document.getElementById('dash-search')?.value||'';
+  const st=document.getElementById('dash-status')?.value||'';
+  const ind=document.getElementById('dash-industry')?.value||'';
+  if(document.getElementById('search')) document.getElementById('search').value=q;
+  if(document.getElementById('filter-status')) document.getElementById('filter-status').value=st;
+  if(document.getElementById('filter-industry')) document.getElementById('filter-industry').value=ind;
+  renderTable();
+}
+function syncFiltersToDashboard(){
+  const q=document.getElementById('search')?.value||'';
+  const st=document.getElementById('filter-status')?.value||'';
+  const ind=document.getElementById('filter-industry')?.value||'';
+  if(document.getElementById('dash-search')) document.getElementById('dash-search').value=q;
+  if(document.getElementById('dash-status')) document.getElementById('dash-status').value=st;
+  if(document.getElementById('dash-industry')) document.getElementById('dash-industry').value=ind;
+  renderCharts(); renderDeadlines(); renderKPIs();
+}
 function initFilters(){
   const iS=document.getElementById('filter-industry'),cS=document.getElementById('filter-cap');
-  INDUSTRIES.forEach(i=>{const o=document.createElement('option');o.textContent=i;iS.appendChild(o);});
+  const diS=document.getElementById('dash-industry');
+  INDUSTRIES.forEach(i=>{
+    const o=document.createElement('option');o.textContent=i;iS.appendChild(o);
+    const o2=document.createElement('option');o2.textContent=i;diS.appendChild(o2);
+  });
   CAPABILITIES.forEach(c=>{const o=document.createElement('option');o.textContent=c;cS.appendChild(o);});
 }
 function updatePocFilter(){
