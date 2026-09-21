@@ -421,15 +421,17 @@ function fmtDate(val) {
 // ============================================================
 function renderKPIs(){
   const a=filterData('dash').filter(r=>r.client);
-  const won=a.filter(r=>r.status==='Won').length, lost=a.filter(r=>r.status==='Lost').length;
+  const won=a.filter(r=>r.status==='Won').length;
+  const lost=a.filter(r=>r.status==='Lost').length;
   const pipeline=a.filter(r=>!['Won','Lost',''].includes(r.status)).length;
   const active=a.filter(r=>['In- Progress','Orals'].includes(r.status)).length;
+  const hold=a.filter(r=>r.status==='On-Hold').length;
   document.getElementById('kpi-row').innerHTML=`
     <div class="kpi c-green"><div class="kpi-num">${a.length}</div><div class="kpi-label">Total RFPs</div></div>
-    <div class="kpi c-blue"><div class="kpi-num">${pipeline}</div><div class="kpi-label">Pipeline</div><div class="kpi-sub">All active statuses</div></div>
+    <div class="kpi c-blue"><div class="kpi-num">${pipeline}</div><div class="kpi-label">Active Pipeline</div><div class="kpi-sub">All active statuses</div></div>
     <div class="kpi c-won"><div class="kpi-num">${won}</div><div class="kpi-label">Won</div></div>
     <div class="kpi c-lost"><div class="kpi-num">${lost}</div><div class="kpi-label">Lost</div></div>
-    <div class="kpi c-hold"><div class="kpi-num">${active}</div><div class="kpi-label">In Progress / Orals</div></div>`;
+    <div class="kpi c-hold"><div class="kpi-num">${hold}</div><div class="kpi-label">On Hold</div></div>`;
 }
 
 // ============================================================
