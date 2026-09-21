@@ -422,15 +422,14 @@ function fmtDate(val) {
 function renderKPIs(){
   const a=filterData('dash').filter(r=>r.client);
   const won=a.filter(r=>r.status==='Won').length, lost=a.filter(r=>r.status==='Lost').length;
-  const active=a.filter(r=>['In- Progress','Orals','Proposal Submitted','Contacted','Identified'].includes(r.status)).length;
-  const hold=a.filter(r=>r.status==='On-Hold').length;
-  const wr=won+lost>0?Math.round(won/(won+lost)*100):0;
+  const pipeline=a.filter(r=>!['Won','Lost',''].includes(r.status)).length;
+  const active=a.filter(r=>['In- Progress','Orals'].includes(r.status)).length;
   document.getElementById('kpi-row').innerHTML=`
     <div class="kpi c-green"><div class="kpi-num">${a.length}</div><div class="kpi-label">Total RFPs</div></div>
-    <div class="kpi c-blue"><div class="kpi-num">${active}</div><div class="kpi-label">Active Pipeline</div><div class="kpi-sub">In Progress / Orals</div></div>
+    <div class="kpi c-blue"><div class="kpi-num">${pipeline}</div><div class="kpi-label">Pipeline</div><div class="kpi-sub">All active statuses</div></div>
     <div class="kpi c-won"><div class="kpi-num">${won}</div><div class="kpi-label">Won</div></div>
     <div class="kpi c-lost"><div class="kpi-num">${lost}</div><div class="kpi-label">Lost</div></div>
-    <div class="kpi c-hold"><div class="kpi-num">${hold}</div><div class="kpi-label">On Hold</div></div>`;
+    <div class="kpi c-hold"><div class="kpi-num">${active}</div><div class="kpi-label">In Progress / Orals</div></div>`;
 }
 
 // ============================================================
@@ -471,7 +470,7 @@ function renderCharts(){
     'Contacted':         '#1565C0', // blue — pipeline
     'Identified':        '#1565C0', // blue — pipeline
     'Verbal Commitment': '#1565C0', // blue — pipeline
-    'On-Hold':           '#E65100', // orange — matches In Progress/Orals KPI
+    'On-Hold':           '#9E9E9E', // grey — separate from pipeline
     'Re-Opened':         '#6A1B9A', // purple
   };
   const statusColors = ss.labels.map(l => STATUS_COLORS[l] || '#999999');
