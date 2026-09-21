@@ -423,7 +423,7 @@ function renderKPIs(){
   const a=filterData('dash').filter(r=>r.client);
   const won=a.filter(r=>r.status==='Won').length;
   const lost=a.filter(r=>r.status==='Lost').length;
-  const pipeline=a.filter(r=>!['Won','Lost',''].includes(r.status)).length;
+  const pipeline=a.filter(r=>!['Won','Lost','On-Hold',''].includes(r.status)).length;
   const active=a.filter(r=>['In- Progress','Orals'].includes(r.status)).length;
   const hold=a.filter(r=>r.status==='On-Hold').length;
   document.getElementById('kpi-row').innerHTML=`
