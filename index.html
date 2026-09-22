@@ -131,7 +131,7 @@
   <div class="header-brand">
     <div class="header-dot"></div>
     <div>
-      <div class="header-title">I&amp;RE Market &amp; Growth — RFP Tracker</div>
+      <div class="header-title">I&amp;RE Market &amp; Growth | Sales Dashboard</div>
       <div class="header-sub">PMY27 · Infrastructure &amp; Real Estate · Live</div>
     </div>
   </div>
@@ -811,12 +811,16 @@ function openPovForm(p){
     <div class="form-group"><label>POV / Eminence Topic *</label><input id="p-topic" value="${p.topic||''}"/></div>
     <div class="form-group"><label>Industry</label><select id="p-industry"><option value="">Select…</option>${iO}</select></div>
     <div class="form-group"><label>Sub-Sector</label><input id="p-subsector" value="${p.subSector||''}"/></div>
+    <div class="form-group"><label>Capability</label><select id="p-cap"><option value="">Select…</option>${CAPABILITIES.map(c=>`<option${p.subCapabilities===c?' selected':''}>${c}</option>`).join('')}</select></div>
     <div class="form-group"><label>POV Status</label><select id="p-status"><option value="">Select…</option>${sO}</select></div>
     <div class="form-group"><label>POV Start Date</label><input id="p-start" type="date" value="${p.startDate||''}"/></div>
     <div class="form-group"><label>US PPMD(s)</label><input id="p-ppmd" value="${p.ppmd||''}"/></div>
     <div class="form-group"><label>USI POC *</label><input id="p-poc" value="${p.usiPOC||''}"/></div>
     <div class="form-group"><label>Senior Manager</label><input id="p-sm" value="${p.seniorManager||''}"/></div>
     <div class="form-group"><label>Manager</label><input id="p-mgr" value="${p.manager||''}"/></div>
+    <div class="form-group"><label>USI Team Member 1</label><input id="p-t1" value="${p.team1||''}"/></div>
+    <div class="form-group"><label>USI Team Member 2</label><input id="p-t2" value="${p.team2||''}"/></div>
+    <div class="form-group"><label>USI Team Member 3</label><input id="p-t3" value="${p.team3||''}"/></div>
     <div class="form-group full"><label>Comments</label><textarea id="p-comments">${p.comments||''}</textarea></div>
     <div class="form-group full"><label>File Link</label><input id="p-link" value="${p.link||''}"/></div>
   </div>`;
@@ -828,7 +832,7 @@ async function savePov(){
   const topic=document.getElementById('p-topic').value.trim();
   const povPOC=document.getElementById('p-poc').value.trim();
   if(!client||!topic||!povPOC){showToast('Client, Topic and USI POC are required','error');return;}
-  const row={id:editingPovId||String(Date.now()),client,topic,industry:document.getElementById('p-industry').value,subSector:document.getElementById('p-subsector').value,status:document.getElementById('p-status').value,startDate:document.getElementById('p-start').value,ppmd:document.getElementById('p-ppmd').value,usiPOC:document.getElementById('p-poc').value,seniorManager:document.getElementById('p-sm').value,manager:document.getElementById('p-mgr').value,lastUpdate:today(),comments:document.getElementById('p-comments').value,link:document.getElementById('p-link').value};
+  const row={id:editingPovId||String(Date.now()),client,topic,industry:document.getElementById('p-industry').value,subSector:document.getElementById('p-subsector').value,subCapabilities:document.getElementById('p-cap').value,status:document.getElementById('p-status').value,startDate:document.getElementById('p-start').value,ppmd:document.getElementById('p-ppmd').value,usiPOC:document.getElementById('p-poc').value,seniorManager:document.getElementById('p-sm').value,manager:document.getElementById('p-mgr').value,team1:document.getElementById('p-t1').value,team2:document.getElementById('p-t2').value,team3:document.getElementById('p-t3').value,lastUpdate:today(),comments:document.getElementById('p-comments').value,link:document.getElementById('p-link').value};
   document.getElementById('pov-save-btn').disabled=true;document.getElementById('pov-save-btn').textContent='Saving…';
   if(editingPovId){const i=povData.findIndex(x=>x.id===editingPovId);if(i>-1)povData[i]=row;}else povData.push(row);
   renderPOV();closeModal();
